@@ -36,119 +36,161 @@
                         <h1 class="h3 mb-0 text-gray-800">Keterangan Berobat</h1>
                     </div>
                     <!-- Tombol Tambah Pasien -->
-                    <div class="mb-4 d-flex justify-content-end">
-                        <a href="{{ url('/tambah_keteranganberobat') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Tambah Pasien
-                        </a>
-                    </div>
-
-
-                    <!-- Daftar Pasien -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Daftar Pasien</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama Pasien</th>
-                                            <th>Umur</th>
-                                            <th>Jenis Kelamin</th>
-                                            <th>Tanggal Masuk</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Andi Saputra</td>
-                                            <td>35</td>
-                                            <td>Laki-laki</td>
-                                            <td>2025-04-22</td>
-                                            <td>
-                                                <a href="#" class="btn btn-info btn-sm"><i class="fas fa-eye"></i></a>
-                                                <a href="#" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
-                                                <a href="#" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                        <!-- Tambah baris pasien lain di sini -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                    <!-- End of Main Content -->
-
-                    <!-- Footer -->
-                    <footer class="sticky-footer bg-white">
-                        <div class="container my-auto">
-                            <div class="copyright text-center my-auto">
-                                <span>Copyright &copy; Your Website 2021</span>
-                            </div>
-                        </div>
-                    </footer>
-                    <!-- End of Footer -->
-
-                </div>
-                <!-- End of Content Wrapper -->
-
+                     <div class="mb-4 d-flex justify-content-end">
+                <a href="{{ url('/tambah_keteranganberobat') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tambah Pasien
+                </a>
             </div>
-            <!-- End of Page Wrapper -->
 
-            <!-- Scroll to Top Button-->
-            <a class="scroll-to-top rounded" href="#page-top">
-                <i class="fas fa-angle-up"></i>
-            </a>
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Daftar Pasien</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Pasien</th>
+                                    <th>Tanggal Lahir</th>
+                                    <th>Jenis Kelamin</th>
+                                    <th>Alamat</th>
+                                    <th>Telepon</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php $no = 1; @endphp
+                                @foreach($keteranganberobat as $pasien)
+                                <tr>
+                                    <td>{{ $no++ }}</td>
+                                    <td>{{ $pasien->nama_pasien }}</td>
+                                    <td>{{ $pasien->tanggal_lahir }}</td>
+                                    <td>{{ $pasien->jenis_kelamin }}</td>
+                                    <td>{{ $pasien->alamat }}</td>
+                                    <td>{{ $pasien->telepon }}</td>
+                                   <td>
+    <button
+        type="button"
+        class="btn btn-info btn-sm btn-view-pemeriksaan"
+        data-toggle="modal"
+        data-target="#pemeriksaanModal"
+        data-nama="{{ $pasien->nama_pasien }}"
+        data-pemeriksaan='@json($pasien->pemeriksaan)'
+    >
+        <i class="fas fa-eye"></i>
+    </button>
+</td>
 
-            <!-- Logout Modal-->
-            <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                        </div>
-                        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                            <a class="btn btn-primary" href="login.html">Logout</a>
-                        </div>
+                                </tr>
+                                @endforeach
+
+                                @if($keteranganberobat->isEmpty())
+                                <tr>
+                                    <td colspan="7" class="text-center">Tidak ada data pasien.</td>
+                                </tr>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Bootstrap core JavaScript-->
-            <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-            <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-            <script>
-                $(document).ready(function() {
-                    $('#dataTable').DataTable();
-                });
-            </script>
+        </div>
+    </div>
+<!-- Modal -->
+<div class="modal fade" id="pemeriksaanModal" tabindex="-1" role="dialog" aria-labelledby="pemeriksaanModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><span id="modalPasienNama"></span> - Data Pemeriksaan</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered" id="tablePemeriksaan">
+          <thead>
+            <tr>
+              <th>Tanggal Mulai</th>
+              <th>Anamnesis</th>
+              <th>Tinggi (cm)</th>
+              <th>Berat (kg)</th>
+              <th>Suhu (°C)</th>
+              <th>Saturasi (%)</th>
+              <th>Tekanan Darah</th>
+              <th>Denyut Nadi</th>
+              <th>Laju Napas</th>
+              <th>Diagnosa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Isi dinamis lewat JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-            <script src="../vendor/jquery/jquery.min.js"></script>
-            <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
 
-            <!-- Core plugin JavaScript-->
-            <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+    <!-- Scripts -->
+    <script>
+$(document).ready(function() {
+  $('.btn-view-pemeriksaan').on('click', function() {
+    const pasienNama = $(this).data('nama');
+    const pemeriksaan = $(this).data('pemeriksaan');
 
-            <!-- Custom scripts for all pages-->
-            <script src="../js/sb-admin-2.min.js"></script>
+    $('#modalPasienNama').text(pasienNama);
 
-            <!-- Page level plugins -->
-            <script src="../vendor/chart.js/Chart.min.js"></script>
+    const tbody = $('#tablePemeriksaan tbody');
+    tbody.empty();
 
-            <!-- Page level custom scripts -->
-            <script src="../js/demo/chart-area-demo.js"></script>
-            <script src="../js/demo/chart-pie-demo.js"></script>
+    if(pemeriksaan.length === 0) {
+      tbody.append('<tr><td colspan="10" class="text-center">Tidak ada data pemeriksaan.</td></tr>');
+    } else {
+      pemeriksaan.forEach(item => {
+        const tekananDarah = item.tekanan_darah_sistolik + '/' + item.tekanan_darah_diastolik;
+        const row = `
+          <tr>
+            <td>${item.mulai_diwawati}</td>
+            <td>${item.anamnesis || '-'}</td>
+            <td>${item.tinggi_badan}</td>
+            <td>${item.berat_badan}</td>
+            <td>${item.suhu_tubuh}</td>
+            <td>${item.saturasi_oksigen}</td>
+            <td>${tekananDarah}</td>
+            <td>${item.nadi}</td>
+            <td>${item.laju_pernapasan}</td>
+            <td>${item.diagnosa}</td>
+          </tr>
+        `;
+        tbody.append(row);
+      });
+    }
+  });
+});
+</script>
+
+    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../js/sb-admin-2.min.js"></script>
+    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable();
+        });
+    </script>
 
 </body>
 

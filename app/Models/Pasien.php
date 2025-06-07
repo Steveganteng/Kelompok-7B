@@ -19,4 +19,12 @@ class Pasien extends Model
         'alamat',
         'telepon',
     ];
+
+    /**
+     * Relasi one-to-many ke pemeriksaan
+     */
+    public function pemeriksaan()
+    {
+        return $this->hasMany(Pemeriksaan::class, 'pasien_id', 'id_pasien');
+    }
 }

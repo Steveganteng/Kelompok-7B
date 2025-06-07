@@ -39,7 +39,7 @@
                     <table class="table table-bordered" id="dataTable" width="100%">
                         <thead class="thead-light">
                         <tr>
-                            <th>ID</th>
+                            <th>No.</th>
                             <th>Nama Golongan</th>
                             <th>Aksi</th>
                         </tr>

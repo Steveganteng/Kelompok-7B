@@ -45,14 +45,12 @@
 
                 <!-- Card Daftar Lokasi Obat -->
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3">
+
+
+
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold text-primary">Daftar Lokasi Obat</h6>
-                    </div>
-
-
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold text-primary">Daftar Penanda Obat</h6>
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahPenandaModal">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahLokasiModal">
                                 <i class="fas fa-plus"></i> Tambah
                             </button>
                     </div>

@@ -14,21 +14,16 @@ return new class extends Migration
         Schema::create('alatkesehatan', function (Blueprint $table) {
             $table->id('id_AlatKesehatan');
             $table->string('nama');
+            $table->string('kode_alat')->unique();
+            $table->string('distributor_alat');
             $table->string('jenis');
             $table->integer('stok');
-            $table->string('deskripsi');
             $table->string('gambar');
-            $table->unsignedBigInteger('golongan_id');
-            $table->unsignedBigInteger('penanda_id');
             $table->unsignedBigInteger('lokasi_id');
-            $table->unsignedBigInteger('satuan_id');
             $table->string('status');
 
             // Define foreign key constraints explicitly
-            $table->foreign('golongan_id')->references('id_golongan')->on('golongan')->onDelete('cascade');
-            $table->foreign('penanda_id')->references('id_penanda')->on('penanda')->onDelete('cascade');
             $table->foreign('lokasi_id')->references('id_lokasi')->on('lokasi')->onDelete('cascade');
-            $table->foreign('satuan_id')->references('id_satuan')->on('satuan')->onDelete('cascade');
 
             $table->timestamps();
         });

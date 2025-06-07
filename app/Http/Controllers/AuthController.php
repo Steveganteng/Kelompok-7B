@@ -27,7 +27,7 @@ class AuthController extends Controller
             } elseif ($user->role === 'dokter') {
                 return redirect('/dokter/dashboard');
             } elseif ($user->role === 'superadmin') {
-                return redirect('/superadmin/dashboard');
+                return redirect('/admin/dashboard');
             } else {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Role tidak dikenali.']);

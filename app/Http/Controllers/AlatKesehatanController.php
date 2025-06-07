@@ -3,123 +3,173 @@
 namespace App\Http\Controllers;
 
 use App\Models\AlatKesehatan;
-use App\Models\Golongan;
-use App\Models\Penanda;
 use App\Models\Lokasi;
-use App\Models\Satuan;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AlatKesehatanController extends Controller
 {
-    // Tampilkan daftar alat kesehatan
     public function index(Request $request)
-{
-    $search = $request->input('search');
-
-    $query = AlatKesehatan::with(['golongan', 'penanda', 'lokasi', 'satuan'])
-        ->orderBy('nama');
-
-    if ($search) {
-        $query->where('nama', 'like', '%' . $search . '%');
-    }
-
-    $alatKesehatans = $query->paginate(10)->appends(['search' => $search]);
-
-    return view('apoteker.alatkesehatan', compact('alatKesehatans', 'search'));
-}
-
-
-    // Tampilkan form tambah alat kesehatan
-    public function create()
     {
-        $golongans = Golongan::all();
-        $penandas = Penanda::all();
-        $lokasis = Lokasi::all();
-        $satuans = Satuan::all();
+        $search = $request->input('search');
 
-        return view('apoteker.tambah_alatkesehatan', compact('golongans', 'penandas', 'lokasis', 'satuans'));
+        // Paginate results instead of getting all data
+        $alatKesehatans = AlatKesehatan::with(['lokasi'])
+            ->when($search, function ($query) use ($search) {
+                return $query->where('nama', 'like', "%{$search}%")
+                             ->orWhere('kode_alat', 'like', "%{$search}%");
+            })
+            ->get()
+            ->map(function ($item) {
+                $item->kadaluarsa_warning = $item->tgl_kadaluarsa &&
+                    Carbon::parse($item->tgl_kadaluarsa)->diffInDays(Carbon::now()) <= 7 &&
+                    !Carbon::parse($item->tgl_kadaluarsa)->isPast();
+                return $item;
+            })
+            ->sortByDesc('kadaluarsa_warning')
+            ->values();
+
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+
+        $paginated = new LengthAwarePaginator(
+            $alatKesehatans->forPage($page, $perPage),
+            $alatKesehatans->count(),
+            $perPage,
+            $page,
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
+        );
+
+        return view('apoteker.alatkesehatan', [
+            'alatKesehatans' => $paginated,
+            'search' => $search,
+        ]);
     }
 
-    // Simpan data alat kesehatan baru
+    public function create()
+{
+    // Fetch unique values for 'area', 'rak', 'baris', 'kolom'
+    $areas = Lokasi::select('area')->distinct()->orderBy('area')->get();
+    $raks = Lokasi::select('rak')->distinct()->orderBy('rak')->get();
+    $bariss = Lokasi::select('baris')->distinct()->orderBy('baris')->get();
+    $koloms = Lokasi::select('kolom')->distinct()->orderBy('kolom')->get();
+
+    return view('apoteker.tambah_alatkesehatan', [
+        'areas' => $areas,
+        'raks' => $raks,
+        'bariss' => $bariss,
+        'koloms' => $koloms,
+    ]);
+}
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'kode_alat' => 'required|string|max:50|unique:alatkesehatan,kode_alat',
             'nama' => 'required|string|max:255',
-            'jenis' => 'required|string|max:255',
             'stok' => 'required|integer',
-            'deskripsi' => 'nullable|string|max:255',
+            'bobot_isi' => 'nullable|integer',
+            'distributor_alat' => 'nullable|string|max:255',
+            'tgl_kadaluarsa' => 'nullable|date',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'golongan_id' => 'required|exists:golongan,id_golongan',
-            'penanda_id' => 'required|exists:penanda,id_penanda',
-            'lokasi_id' => 'required|exists:lokasi,id_lokasi',
-            'satuan_id' => 'required|exists:satuan,id_satuan',
-            'harga' => 'required|integer',
-            'status' => 'required|string|in:Tersedia,Dipakai,Sekali Pakai',
+            'area' => 'required|string|max:255',
+            'rak' => 'required|string|max:255',
+            'baris' => 'required|string|max:255',
+            'kolom' => 'required|string|max:255',
+        ]);
+
+        // Create or find existing lokasi
+        $lokasi = Lokasi::firstOrCreate([
+            'area' => $request->area,
+            'rak' => $request->rak,
+            'baris' => $request->baris,
+            'kolom' => $request->kolom,
+        ]);
+
+        if ($request->hasFile('gambar')) {
+            $validated['gambar'] = $request->file('gambar')->store('gambar-alatkesehatan', 'public');
+        }
+
+        // Combine validated data with lokasi_id and create new record
+        AlatKesehatan::create(array_merge($validated, [
+            'lokasi_id' => $lokasi->id_lokasi,
+        ]));
+
+        return redirect()->route('alatkesehatan.index')->with('success', 'Alat kesehatan berhasil ditambahkan.');
+    }
+// In AlatKesehatanController.php
+
+public function updateStatus(Request $request, $id)
+{
+    $validated = $request->validate([
+        'status' => 'required|string|in:Available,Unavailable',  // Ensure status is either 'Available' or 'Unavailable'
+    ]);
+
+    // Find the alat (medical tool) by ID and update its status
+    $alat = AlatKesehatan::findOrFail($id);
+    $alat->status = $validated['status'];  // Update the status field
+
+    $alat->save();  // Save the updated status to the database
+
+    return redirect()->route('alatkesehatan.index')->with('success', 'Status alat kesehatan berhasil diperbarui.');
+}
+
+    public function edit($id)
+    {
+        $alat = AlatKesehatan::with(['lokasi'])->findOrFail($id);
+
+        // Get dropdown data for location
+        $areas = Lokasi::select('area')->distinct()->orderBy('area')->get();
+        $raks = Lokasi::select('rak')->distinct()->orderBy('rak')->get();
+        $bariss = Lokasi::select('baris')->distinct()->orderBy('baris')->get();
+        $koloms = Lokasi::select('kolom')->distinct()->orderBy('kolom')->get();
+
+        return view('apoteker.edit_alatkesehatan', [
+            'alat' => $alat,
+            'areas' => $areas,  // Corrected variable name
+            'raks' => $raks,
+            'bariss' => $bariss,
+            'koloms' => $koloms,
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $alat = AlatKesehatan::findOrFail($id);
+
+        $validated = $request->validate([
+            'kode_alat' => 'required|string|max:50|unique:alatkesehatan,kode_alat,' . $id . ',id_AlatKesehatan',
+            'nama' => 'required|string|max:255',
+            'stok' => 'required|integer',
+            'bobot_isi' => 'nullable|integer',
+            'distributor_alat' => 'nullable|string|max:255',
+            'tgl_kadaluarsa' => 'nullable|date',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'area' => 'required|string|max:255',
+            'rak' => 'required|string|max:255',
+            'baris' => 'required|string|max:255',
+            'kolom' => 'required|string|max:255',
+        ]);
+
+        // Create or find existing lokasi
+        $lokasi = Lokasi::firstOrCreate([
+            'area' => $request->area,
+            'rak' => $request->rak,
+            'baris' => $request->baris,
+            'kolom' => $request->kolom,
         ]);
 
         if ($request->hasFile('gambar')) {
             $validated['gambar'] = $request->file('gambar')->store('gambar-alatkesehatan', 'public');
         } else {
-            $validated['gambar'] = null;
+            $validated['gambar'] = $alat->gambar;
         }
 
-        AlatKesehatan::create($validated);
+        // Update the record with validated data and location ID
+        $alat->update(array_merge($validated, [
+            'lokasi_id' => $lokasi->id_lokasi,
+        ]));
 
-        return redirect()->route('alatkesehatan.index')->with('success', 'Alat kesehatan berhasil ditambahkan.');
-    }
-
-    // Tampilkan form edit alat kesehatan berdasarkan ID
-    public function edit($id)
-    {
-        $alat = AlatKesehatan::findOrFail($id);
-        $golongans = Golongan::all();
-        $penandas = Penanda::all();
-        $lokasis = Lokasi::all();
-        $satuans = Satuan::all();
-
-        return view('apoteker.edit_alatkesehatan', compact('alat', 'golongans', 'penandas', 'lokasis', 'satuans'));
-    }
-
-    // Update data alat kesehatan berdasarkan ID
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'jenis' => 'required|string|max:255',
-            'stok' => 'required|integer',
-            'deskripsi' => 'nullable|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'golongan_id' => 'required|exists:golongan,id_golongan',
-            'penanda_id' => 'required|exists:penanda,id_penanda',
-            'lokasi_id' => 'required|exists:lokasi,id_lokasi',
-            'satuan_id' => 'required|exists:satuan,id_satuan',
-            'harga' => 'required|integer',
-            'status' => 'required|string|in:Tersedia,Dipakai,Sekali Pakai',
-        ]);
-
-        $alat = AlatKesehatan::findOrFail($id);
-
-        if ($request->hasFile('gambar')) {
-            $gambarPath = $request->file('gambar')->store('gambar-alatkesehatan', 'public');
-            $alat->gambar = $gambarPath;
-        }
-
-        $alat->update($request->except('gambar'));
-
-        return redirect()->route('alatkesehatan.index')->with('success', 'Data alat kesehatan berhasil diperbarui.');
-    }
-
-    // Update status alat kesehatan via modal atau form khusus
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|string|in:Tersedia,Dipakai,Sekali Pakai',
-        ]);
-
-        $alat = AlatKesehatan::findOrFail($id);
-        $alat->status = $request->status;
-        $alat->save();
-
-        return redirect()->back()->with('success', 'Status alat kesehatan berhasil diperbarui.');
+        return redirect()->route('alatkesehatan.index')->with('success', 'Alat kesehatan berhasil diperbarui.');
     }
 }

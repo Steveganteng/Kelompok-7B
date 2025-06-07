@@ -3,104 +3,190 @@
 
 <head>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Apotik Medicoal</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Apotik Medicoal - Dashboard</title>
 
     <!-- Custom fonts for this template-->
-    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet" />
 
     <!-- Custom styles for this template-->
-    <link href="../css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet" />
+
+    <style>
+        .card {
+            border-radius: 0.75rem;
+            transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+        }
+
+        .card .card-body i {
+            color: #4e73df;
+        }
+    </style>
 
 </head>
 
 <body id="page-top">
 
-    <!-- Page Wrapper -->
     <div id="wrapper">
-
         <!-- Sidebar -->
-        @include('../layouts/navigation_apoteker')
+        @include('layouts.navigation_apoteker')
+        <!-- End of Sidebar -->
 
-            <!-- End of Topbar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
             <!-- Main Content -->
+            <div id="content" class="bg-light">
 
-            <body class="bg-light">
+                <!-- Topbar -->
+                <!-- End of Topbar -->
 
-                <div class="container py-5">
+                <!-- Begin Page Content -->
+                <div class="container-fluid py-4">
+
+                    <!-- Logo Center -->
                     <div class="text-center mb-5">
-                        <img src="../img/logo.png" alt="MediCoal" style="width: 100px;">
+                        <img src="{{ asset('img/logo.png') }}" alt="MediCoal" style="width: 120px; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.15));" />
                     </div>
+
                     <div class="row">
 
-                        <!-- Produk Farmasi dari Pembelian -->
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow h-100 py-2">
+                        <!-- Resep Obat -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-pills fa-2x text-primary mb-3"></i>
-                                    <h5 class="card-title">Data Produk Pembelian</h5>
-                                    <a href="pengelolaanpembelian.html" class="btn btn-primary btn-sm mt-2">Buka</a>
+                                    <i class="fas fa-prescription-bottle-alt fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Resep Obat</h5>
+                                    <a href="{{ url('/resepobat') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Produk Farmasi dari Peminjaman -->
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow h-100 py-2">
+                        <!-- Data Obat -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-hand-holding-medical fa-2x text-primary mb-3"></i>
-                                    <h5 class="card-title">Data Produk Peminjaman</h5>
-                                    <a href="pengelolaanpeminjaman.html" class="btn btn-primary btn-sm mt-2">Buka</a>
+                                    <i class="fas fa-database fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Data Obat</h5>
+                                    <a href="{{ url('/dataobat') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Stok dan Expired Obat -->
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow h-100 py-2">
+                        <!-- Produk Kesehatan -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-warehouse fa-2x text-primary mb-3"></i>
-                                    <h5 class="card-title">Stok & Expired</h5>
-                                    <a href="stokdanexpired.html" class="btn btn-primary btn-sm mt-2">Buka</a>
+                                    <i class="fas fa-medkit fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Produk Kesehatan</h5>
+                                    <a href="{{ url('/produkkesehatan') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Master Data -->
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow h-100 py-2">
+                        <!-- Alat Kesehatan -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-database fa-2x text-primary mb-3"></i>
-                                    <h5 class="card-title">Master Data</h5>
-                                    <a href="masterdataobat.html" class="btn btn-primary btn-sm mt-2">Buka</a>
+                                    <i class="fas fa-stethoscope fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Alat Kesehatan</h5>
+                                    <a href="{{ url('/alatkesehatan') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Approval Peminjaman -->
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow h-100 py-2">
+                        <!-- Golongan Obat -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-clipboard-check fa-2x text-primary mb-3"></i>
-                                    <h5 class="card-title">Approval Peminjaman</h5>
-                                    <a href="peminjamanproduk.html" class="btn btn-primary btn-sm mt-2">Buka</a>
+                                    <i class="fas fa-tag fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Golongan Obat</h5>
+                                    <a href="{{ url('/golonganobat') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Satuan Obat -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-ruler fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Satuan Obat</h5>
+                                    <a href="{{ url('/satuanobat') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lokasi Obat -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-map-marker-alt fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Lokasi Obat</h5>
+                                    <a href="{{ url('/lokasiobat') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Penanda Obat -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-flag fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Penanda Obat</h5>
+                                    <a href="{{ url('/penandaobat') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Laporan Produk Farmasi -->
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow h-100 py-2">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
                                 <div class="card-body text-center">
-                                    <i class="fas fa-file-medical fa-2x text-primary mb-3"></i>
-                                    <h5 class="card-title">Laporan Produk</h5>
-                                    <a href="laporanproduk.html" class="btn btn-primary btn-sm mt-2">Buka</a>
+                                    <i class="fas fa-file-medical fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Laporan Produk Farmasi</h5>
+                                    <a href="{{ url('/laporanproduk') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pembelian Produk -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-pills fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Pembelian Produk</h5>
+                                    <a href="{{ url('/pengelolaanpembelian') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Peminjaman Produk -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-hand-holding-medical fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Peminjaman Produk</h5>
+                                    <a href="{{ url('/pengelolaanpeminjaman') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Adjustment Produk -->
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="card shadow h-100 py-3">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-exchange-alt fa-3x mb-3"></i>
+                                    <h5 class="card-title font-weight-bold">Adjustment Produk</h5>
+                                    <a href="{{ url('/adjustmentproduk') }}" class="btn btn-primary btn-sm mt-3 px-4">Buka</a>
                                 </div>
                             </div>
                         </div>
@@ -108,81 +194,44 @@
                     </div>
 
                 </div>
+                <!-- /.container-fluid -->
 
-        </div>
-
-    </div>
-
-    </div>
-
-
-    <!-- End of Main Content -->
-
-    <!-- Footer -->
-    <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-            <div class="copyright text-center my-auto">
-                <span>Copyright &copy; Your Website 2021</span>
             </div>
-        </div>
-    </footer>
-    <!-- End of Footer -->
+            <!-- End of Main Content -->
 
-    </div>
-    <!-- End of Content Wrapper -->
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white shadow-sm">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto text-gray-600">
+                        <span>Copyright &copy; Apotik Medicoal 2025</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
 
     </div>
     <!-- End of Page Wrapper -->
 
-    <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+    <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#dataTable').DataTable();
         });
     </script>
 
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="../js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="../vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="../js/demo/chart-area-demo.js"></script>
-    <script src="../js/demo/chart-pie-demo.js"></script>
-
-    </body>
+</body>
 
 </html>

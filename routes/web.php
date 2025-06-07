@@ -13,7 +13,18 @@ use App\Http\Controllers\ObatController;
 use App\Http\Controllers\AlatKesehatanController;
 use App\Http\Controllers\ProdukKesehatanController;
 use App\Http\Controllers\PasienController;
+use App\Http\Controllers\RawatJalanController;
 use App\Http\Controllers\ResepController;
+use App\Http\Controllers\kecelakaankerjaController;
+use App\Http\Controllers\keteranganberobatController;
+use App\Http\Controllers\pemeriksaankesehatanController;
+use App\Http\Controllers\narkotikaalkoholController;
+use App\Http\Controllers\rawatinapController;
+
+
+
+
+
 
 
 
@@ -42,9 +53,7 @@ Route::get('/dokter/dashboard', function () {
     return view('dokter.index');
 });
 
-Route::get('/superadmin/dashboard', function () {
-    return 'Superadmin Dashboard (buat view sesuai kebutuhan)';
-});
+Route::view('/dashboard_admin', 'admin.dashboard_admin');
 
 
 // ====== Routes untuk Apoteker ======
@@ -64,10 +73,11 @@ Route::put('/update_dataobat/{id}', [ObatController::class, 'update'])->name('up
 Route::get('/alatkesehatan', [AlatKesehatanController::class, 'index'])->name('alatkesehatan.index');
 Route::get('/tambah_alatkesehatan', [AlatKesehatanController::class, 'create'])->name('alatkesehatan.create');
 Route::post('/tambah_alatkesehatan', [AlatKesehatanController::class, 'store'])->name('alatkesehatan.store');
-Route::get('/alatkesehatan', [AlatKesehatanController::class, 'index'])->name('alatkesehatan.index');
 Route::get('/alatkesehatan/{id}/edit', [AlatKesehatanController::class, 'edit'])->name('alatkesehatan.edit');
 Route::put('/alatkesehatan/{id}', [AlatKesehatanController::class, 'update'])->name('alatkesehatan.update');
 Route::post('/alatkesehatan/{id}/update-status', [AlatKesehatanController::class, 'updateStatus'])->name('alatkesehatan.updateStatus');
+
+
 
 
 Route::get('/produkkesehatan', [ProdukKesehatanController::class, 'index'])->name('produkkesehatan.index');
@@ -83,9 +93,10 @@ Route::view('/bobotobat', 'apoteker.bobotobat')->name('bobotobat');
 Route::view('/golonganobat', 'apoteker.golonganobat');
 Route::view('/lokasiobat', 'apoteker.lokasiobat');
 Route::view('/penandaobat', 'apoteker.penandaobat');
-Route::view('/resepobat', 'apoteker.resepobat');
 Route::view('/satuanobat', 'apoteker.satuanobat');
 Route::view('/tambah_alatkesehatan', 'apoteker.tambah_alatkesehatan');Route::view('/tambah_produkkesehatan', 'apoteker.tambah_produkkesehatan');
+Route::patch('/alatkesehatan/{id}/update-status', [AlatKesehatanController::class, 'updateStatus'])->name('alatkesehatan.updateStatus');
+
 
 Route::get('/golonganobat', [GolonganObatController::class, 'index'])->name('golongan_obat.index');
 Route::get('/golonganobat/create', [GolonganObatController::class, 'create'])->name('golongan_obat.create');
@@ -110,28 +121,41 @@ Route::get('/lokasiobat', [LokasiController::class, 'index'])->name('lokasi.inde
 Route::post('/lokasiobat', [LokasiController::class, 'store'])->name('lokasi.store');
 Route::put('/lokasiobat/{id}', [LokasiController::class, 'update'])->name('lokasi.update');
 
+
+
+Route::get('/resepobat', [ResepController::class, 'index'])->name('resep.index');
+Route::get('/resep/update-status/{id}/{status}', [ResepController::class, 'updateStatus'])->name('updateStatus');
+
+
 // ====== Routes untuk Dokter ======
-Route::view('/kecelakaankerja', 'dokter.kecelakaankerja');
-Route::view('/keteranganberobat', 'dokter.keteranganberobat');
-Route::view('/narkotikaalkohol', 'dokter.narkotikaalkohol');
-Route::view('/pemeriksaankesehatan', 'dokter.pemeriksaankesehatan');
-Route::view('/rawatinap', 'dokter.rawatinap');
-Route::view('/rawatjalan', 'dokter.rawatjalan');
-Route::view('/tambah_kecelakaankerja', 'dokter.tambah_kecelakaankerja');
-Route::view('/tambah_keteranganberobat', 'dokter.tambah_keteranganberobat');
-Route::view('/tambah_narkotikaalkohol', 'dokter.tambah_narkotikaalkohol');
-Route::view('/tambah_pemeriksaankesehatan', 'dokter.tambah_pemeriksaankesehatan');
-Route::view('/tambah_rawatinap', 'dokter.tambah_rawatinap');
-Route::view('/tambah_rawatjalan', 'dokter.tambah_rawatjalan');
+// Kecelakaan Kerja
+Route::get('/kecelakaankerja', [KecelakaanKerjaController::class, 'index'])->name('kecelakaankerja.index');
+Route::get('/tambah_kecelakaankerja', [KecelakaanKerjaController::class, 'create'])->name('kecelakaankerja.create');
+Route::post('/tambah_kecelakaankerja', [KecelakaanKerjaController::class, 'store'])->name('kecelakaankerja.store');
+
+// Keterangan Berobat
+Route::get('/keteranganberobat', [KeteranganBerobatController::class, 'index'])->name('keteranganberobat.index');
+Route::get('/tambah_keteranganberobat', [KeteranganBerobatController::class, 'create'])->name('keteranganberobat.create');
+Route::post('/tambah_keteranganberobat', [KeteranganBerobatController::class, 'store'])->name('keteranganberobat.store');
+
+// Narkotika Alkohol
+Route::get('/narkotikaalkohol', [NarkotikaAlkoholController::class, 'index'])->name('narkotikaalkohol.index');
+Route::get('/tambah_narkotikaalkohol', [NarkotikaAlkoholController::class, 'create'])->name('narkotikaalkohol.create');
+Route::post('/tambah_narkotikaalkohol', [NarkotikaAlkoholController::class, 'store'])->name('narkotikaalkohol.store');
+
+// Pemeriksaan Kesehatan
+Route::get('/pemeriksaankesehatan', [PemeriksaanKesehatanController::class, 'index'])->name('pemeriksaankesehatan.index');
+Route::get('/tambah_pemeriksaankesehatan', [PemeriksaanKesehatanController::class, 'create'])->name('pemeriksaankesehatan.create');
+Route::post('/tambah_pemeriksaankesehatan', [PemeriksaanKesehatanController::class, 'store'])->name('pemeriksaankesehatan.store');
+
+// Rawat Inap
+Route::get('/rawatinap', [RawatInapController::class, 'index'])->name('rawatinap.index');
+Route::get('/tambah_rawatinap', [RawatInapController::class, 'create'])->name('rawatinap.create');
+Route::post('/tambah_rawatinap', [RawatInapController::class, 'store'])->name('rawatinap.store');
 
 Route::view('/tambah_tindakan', 'dokter.tambah_tindakan');
 Route::view('/tambah_resepobat', 'dokter.tambah_resepobat');
 
-
-
-
-
-Route::get('/tambah_rawatjalan', [PasienController::class, 'showFormTambah'])->name('rawatjalan.form');
-Route::post('/tambah_rawatjalan', [PasienController::class, 'storeRawatJalan'])->name('rawatjalan.store');
-Route::get('/tambah_resepobat', [ResepController::class, 'showForm'])->name('resep.form');
-Route::post('/tambah_resepobat', [ResepController::class, 'storeResep'])->name('resep.store');
+Route::get('/rawatjalan', [RawatJalanController::class, 'index'])->name('rawatjalan.index');
+Route::get('/tambah_rawatjalan', [RawatJalanController::class, 'create'])->name('rawatjalan.create');
+Route::post('/tambah_rawatjalan', [RawatJalanController::class, 'store'])->name('rawatjalan.store');

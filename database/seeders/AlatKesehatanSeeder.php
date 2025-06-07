@@ -4,10 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\AlatKesehatan;
-use App\Models\Golongan;
-use App\Models\Penanda;
 use App\Models\Lokasi;
-use App\Models\Satuan;
 use Faker\Factory as Faker;
 
 class AlatKesehatanSeeder extends Seeder
@@ -16,33 +13,35 @@ class AlatKesehatanSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // Ambil semua ID dari tabel relasi sebagai sumber data
-        $golonganIds = Golongan::pluck('id_golongan')->toArray();
-        $penandaIds  = Penanda::pluck('id_penanda')->toArray();
-        $lokasiIds   = Lokasi::pluck('id_lokasi')->toArray();
-        $satuanIds   = Satuan::pluck('id_satuan')->toArray();
+        $lokasiIds = Lokasi::pluck('id_lokasi')->toArray();
 
-        // Contoh nama alat kesehatan (bisa ditambah sesuai kebutuhan)
-        $namaAlkesList = [
-            'Tensimeter Digital', 'Stetoskop', 'Termometer Infrared', 'Alat Cek Gula Darah',
-            'Oximeter', 'Nebulizer', 'Timbangan Digital', 'Sphygmomanometer',
-            'Alat Ukur Tinggi Badan', 'Lampu Periksa', 'Sterilizer UV', 'Suction Pump',
-            'Infusion Set', 'Bed Pasien', 'Alat Tes Kehamilan', 'Masker Oksigen'
+        $alatList = [
+            'Tensimeter', 'Termometer', 'Stetoskop', 'Nebulizer', 'Alat Cek Gula Darah',
+            'Suction Pump', 'Infusion Set', 'Alat Cek Kolesterol', 'Oximeter', 'Alat EKG',
+            'Lampu Operasi', 'Sterilizer', 'Timbangan Bayi', 'Kursi Roda', 'Meja Operasi',
+            'Alat Cek Asam Urat', 'Masker Oksigen', 'Sfigmomanometer', 'Alat USG', 'Pompa ASI'
         ];
 
-        // Loop untuk menghasilkan 50 data alat kesehatan acak
-        for ($i = 0; $i < 50; $i++) {
+        $distributorList = [
+            'Meditek', 'Berca Medika', 'Nipro', 'OneMed', 'Kimia Farma Medika',
+            'Kalbe Medika', 'Mandala Medika', 'Trans Medika', 'RSUP Distributor'
+        ];
+
+        $jenisList = ['Disposable', 'Non-Disposable'];
+        $statusList = ['Unavalaible', 'Avalaible'];
+
+        for ($i = 1; $i <= 50; $i++) {
+            $namaAlat = $faker->randomElement($alatList);
+
             AlatKesehatan::create([
-                'nama'         => $faker->randomElement($namaAlkesList),
-                'jenis'        => $faker->randomElement(['Elektronik', 'Manual', 'Digital', 'Portabel']),
-                'stok'         => $faker->numberBetween(1, 100),
-                'deskripsi'    => $faker->sentence(10),
-                'gambar'       => 'default_alkes.jpg',
-                'golongan_id'  => $faker->randomElement($golonganIds),
-                'penanda_id'   => $faker->randomElement($penandaIds),
-                'lokasi_id'    => $faker->randomElement($lokasiIds),
-                'satuan_id'    => $faker->randomElement($satuanIds),
-                'status'       => $faker->randomElement(['Aktif', 'Nonaktif']),
+                'kode_alat'        => 'ALT' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'nama'             => $namaAlat,
+                'jenis'            => $faker->randomElement($jenisList),
+                'distributor_alat' => $faker->randomElement($distributorList),
+                'stok'             => $faker->numberBetween(5, 100),
+                'gambar'           => 'default.jpg', // Kamu bisa sesuaikan atau pake faker image
+                'lokasi_id'        => $faker->randomElement($lokasiIds),
+                'status'           => $faker->randomElement($statusList),
             ]);
         }
     }

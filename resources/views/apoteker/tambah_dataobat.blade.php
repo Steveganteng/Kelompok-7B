@@ -55,157 +55,165 @@
                     <div class="tab-content" id="myTabContent">
 
                         <!-- Tab 1: Input Manual -->
-                        <div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-                            <form action="{{ route('simpan_dataobat') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
+                        <!-- Tab 1: Input Manual -->
+<div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+    <form action="{{ route('simpan_dataobat') }}" method="POST" enctype="multipart/form-data">
+        @csrf
 
-                                <!-- Upload Gambar dengan Tombol -->
-<div class="form-group text-center">
-    <!-- Preview Gambar -->
-    <img
-        id="previewGambar"
-        src="https://via.placeholder.com/150"
-        alt="Preview Gambar Obat"
-        class="img-fluid img-thumbnail mb-3"
-        style="max-width: 200px; max-height: 200px; object-fit: cover;"
-    >
+        <!-- Preview & Upload Gambar -->
+        <div class="form-group text-center">
+            <img id="previewGambar"
+                 src="https://via.placeholder.com/150"
+                 alt="Preview Gambar Obat"
+                 class="img-fluid img-thumbnail mb-3"
+                 style="max-width:200px; max-height:200px; object-fit:cover;">
+            <input type="file" name="gambar" id="uploadGambar" accept="image/*" class="d-none" onchange="loadPreview(this)">
+            <button type="button" class="btn btn-secondary" onclick="$('#uploadGambar').click()">
+                <i class="fas fa-upload"></i> Pilih Gambar
+            </button>
+            <small class="form-text text-muted">Max 2MB, JPG/JPEG/PNG</small>
+        </div>
 
-    <!-- Tombol Upload -->
-    <div>
-        <input type="file" name="gambar" id="uploadGambar" accept="image/*" class="d-none" onchange="loadPreview(this)">
-        <button type="button" class="btn btn-secondary" onclick="document.getElementById('uploadGambar').click();">
-            <i class="fas fa-upload"></i> Pilih Gambar
+        <!-- Nama Dagang -->
+        <div class="form-group">
+            <label>Nama Dagang Obat</label>
+            <input type="text" name="nama_dagang_obat" class="form-control"
+                   placeholder="Contoh: Paracetamol XR" required>
+        </div>
+
+        <!-- Nama Generik -->
+        <div class="form-group">
+            <label>Nama Generik Obat</label>
+            <input type="text" name="nama_obat" class="form-control"
+                   placeholder="Contoh: Paracetamol" required>
+        </div>
+
+        <!-- Distributor -->
+        <div class="form-group">
+            <label>Distributor Obat</label>
+            <input type="text" name="distributor_obat" class="form-control"
+                   placeholder="Contoh: Kimia Farma" required>
+        </div>
+
+        <!-- Golongan & Penanda -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>Golongan</label>
+                <select name="golongan_id" class="form-control" required>
+                    <option value="">-- Pilih Golongan --</option>
+                    @foreach($golongans as $g)
+                        <option value="{{ $g->id_golongan }}">{{ $g->NamaGolongan }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Penanda</label>
+                <select name="penanda_id" class="form-control" required>
+                    <option value="">-- Pilih Penanda --</option>
+                    @foreach($penandas as $p)
+                        <option value="{{ $p->id_penanda }}">{{ $p->nama_penanda }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <!-- Satuan & Bobot Isi -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>Satuan Kemasan</label>
+                <select name="satuan_id" class="form-control" required>
+                    <option value="">-- Pilih Satuan --</option>
+                    @foreach($satuans as $s)
+                        <option value="{{ $s->id_satuan }}">{{ $s->nama_satuan }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Bobot Isi (mg)</label>
+                <input type="number" name="bobot_isi" class="form-control"
+                       placeholder="Contoh: 500" min="1" required>
+            </div>
+        </div>
+
+        <!-- Harga & Stok -->
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>Harga (Rp)</label>
+                <input type="number" name="harga" class="form-control"
+                       placeholder="Contoh: 2500" min="0" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Stok</label>
+                <input type="number" name="stok" class="form-control"
+                       placeholder="Contoh: 100" min="0" required>
+            </div>
+        </div>
+
+        <!-- Tanggal Kadaluarsa -->
+        <div class="form-group">
+            <label>Tanggal Kadaluarsa</label>
+            <input type="date" name="tgl_kadaluarsa" class="form-control" required>
+        </div>
+
+        <!-- Deskripsi Obat (opsional) -->
+        <div class="form-group">
+            <label>Deskripsi Obat (Opsional)</label>
+            <textarea name="deskripsi" class="form-control" rows="2"
+                      placeholder="Keterangan tambahan..."></textarea>
+        </div>
+
+        <!-- Lokasi Penyimpanan -->
+        <h5 class="mt-4 mb-3">Lokasi Penyimpanan</h5>
+        <div class="form-group">
+            <label>Area</label>
+            <select name="area" class="form-control" required>
+                <option value="">-- Pilih Area --</option>
+                @foreach($lokasis->pluck('area')->unique() as $area)
+                    <option value="{{ $area }}">{{ $area }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label>Rak</label>
+                <select name="rak" class="form-control" required>
+                    <option value="">-- Pilih Rak --</option>
+                    @foreach($lokasis->pluck('rak')->unique() as $rak)
+                        <option value="{{ $rak }}">{{ $rak }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Baris</label>
+                <select name="baris" class="form-control" required>
+                    <option value="">-- Pilih Baris --</option>
+                    @foreach($lokasis->pluck('baris')->unique() as $baris)
+                        <option value="{{ $baris }}">{{ $baris }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label>Kolom</label>
+                <select name="kolom" class="form-control" required>
+                    <option value="">-- Pilih Kolom --</option>
+                    @foreach($lokasis->pluck('kolom')->unique() as $kolom)
+                        <option value="{{ $kolom }}">{{ $kolom }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Deskripsi Lokasi (Opsional)</label>
+            <textarea name="deskripsi_lokasi" class="form-control" rows="2"
+                      placeholder="Keterangan tambahan lokasi..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-4">
+            <i class="fas fa-save"></i> Simpan Data
         </button>
-    </div>
-    <small class="form-text text-muted mt-2">Maksimal ukuran file 2MB. Format: JPG, JPEG, PNG</small>
+    </form>
 </div>
-
-
-                                <!-- Nama Obat -->
-                                <div class="form-group">
-                                    <label>Nama Obat</label>
-                                    <input type="text" name="NamaObat" class="form-control"
-                                        placeholder="Contoh: Paracetamol" required>
-                                </div>
-
-                                <!-- Golongan -->
-                                <div class="form-group">
-                                    <label>Golongan</label>
-                                    <select name="golongan_id" class="form-control" required>
-                                        <option value="">-- Pilih Golongan --</option>
-                                        @foreach ($golongans as $g)
-                                        <option value="{{ $g->id_golongan }}">{{ $g->NamaGolongan }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <!-- Satuan -->
-                                <div class="form-group">
-                                    <label>Satuan Kemasan</label>
-                                    <select name="satuan_id" class="form-control" required>
-                                        <option value="">-- Pilih Satuan --</option>
-                                        @foreach ($satuans as $s)
-                                        <option value="{{ $s->id_satuan }}">{{ $s->nama_satuan }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <!-- Isi Kemasan dan Bobot -->
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label>Isi per Kemasan</label>
-                                        <input type="text" name="isi_kemasan" class="form-control"
-                                            placeholder="Contoh: 10 Tablet" required>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label>Bobot Isi</label>
-                                        <input type="text" name="bobot_isi" class="form-control"
-                                            placeholder="Contoh: 500mg" required>
-                                    </div>
-                                </div>
-
-                                <!-- Harga dan Stok -->
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label>Harga</label>
-                                        <input type="number" name="harga" class="form-control"
-                                            placeholder="Contoh: 2500" required>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <label>Stok</label>
-                                        <input type="number" name="stok" class="form-control" placeholder="Contoh: 100"
-                                            required>
-                                    </div>
-                                </div>
-
-                                <!-- Penanda -->
-                                <div class="form-group">
-                                    <label>Penanda</label>
-                                    <select name="penanda_id" class="form-control" required>
-                                        <option value="">-- Pilih Penanda --</option>
-                                        @foreach ($penandas as $p)
-                                        <option value="{{ $p->id_penanda }}">{{ $p->nama_penanda }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <h5 class="mt-4 mb-3">Lokasi Penyimpanan</h5>
-
-                                <div class="form-group">
-                                    <label>Area</label>
-                                    <select name="area" class="form-control" required>
-                                        <option value="">-- Pilih Area --</option>
-                                        @foreach ($lokasis->pluck('area')->unique() as $area)
-                                            <option value="{{ $area }}">{{ $area }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group col-md-4">
-                                        <label>Rak</label>
-                                        <select name="rak" class="form-control" required>
-                                            <option value="">-- Pilih Rak --</option>
-                                            @foreach ($lokasis->pluck('rak')->unique() as $rak)
-                                                <option value="{{ $rak }}">{{ $rak }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                
-                                    <div class="form-group col-md-4">
-                                        <label>Baris</label>
-                                        <select name="baris" class="form-control" required>
-                                            <option value="">-- Pilih Baris --</option>
-                                            @foreach ($lokasis->pluck('baris')->unique() as $baris)
-                                                <option value="{{ $baris }}">{{ $baris }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                
-                                    <div class="form-group col-md-4">
-                                        <label>Kolom</label>
-                                        <select name="kolom" class="form-control" required>
-                                            <option value="">-- Pilih Kolom --</option>
-                                            @foreach ($lokasis->pluck('kolom')->unique() as $kolom)
-                                                <option value="{{ $kolom }}">{{ $kolom }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                
-
-                                <div class="form-group">
-                                    <label>Deskripsi Lokasi (Opsional)</label>
-                                    <textarea name="deskripsi" class="form-control" rows="2"
-                                        placeholder="Keterangan tambahan lokasi..."></textarea>
-                                </div>
-
-
-                                <button type="submit" class="btn btn-primary btn-block mt-4">
-                                    <i class="fas fa-save"></i> Simpan Data
-                                </button>
-                            </form>
-                        </div>
 
                         <!-- Tab 2: Upload File -->
                         <div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">

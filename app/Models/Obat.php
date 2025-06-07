@@ -11,43 +11,46 @@ class Obat extends Model
 
     protected $table = 'obat';
     protected $primaryKey = 'id_obat';
-    public $incrementing = true;
-    protected $keyType = 'int';
 
     protected $fillable = [
-        'NamaObat',
-        'stok',
-        'deskripsi',
-        'harga',
-        'bobot_isi',
-        'gambar',
-        'golongan_id',
-        'penanda_id',
-        'lokasi_id',
-        'satuan_id',
+        'kode_obat', 'nama_dagang_obat', 'nama_obat', 'stok', 'deskripsi',
+        'harga', 'bobot_isi', 'gambar', 'distributor_obat', 'golongan_id',
+        'penanda_id', 'lokasi_id', 'satuan_id', 'tgl_kadaluarsa',
+    ];
+        // Automatically cast tgl_kadaluarsa to a Carbon instance
+    protected $casts = [
+        'tgl_kadaluarsa' => 'datetime',
     ];
 
-    // Relasi ke golongan
+    // Relationship with Golongan
     public function golongan()
     {
         return $this->belongsTo(Golongan::class, 'golongan_id', 'id_golongan');
     }
 
-    // Relasi ke penanda
+    // Relationship with Penanda
     public function penanda()
     {
         return $this->belongsTo(Penanda::class, 'penanda_id', 'id_penanda');
     }
 
-    // Relasi ke lokasi
+    // Relationship with Satuan
+    public function satuan()
+    {
+        return $this->belongsTo(Satuan::class, 'satuan_id', 'id_satuan');
+    }
+
+    // Relationship with Lokasi
     public function lokasi()
     {
         return $this->belongsTo(Lokasi::class, 'lokasi_id', 'id_lokasi');
     }
 
-    // Relasi ke satuan
-    public function satuan()
+    // Define many-to-many relationship with Resep
+    public function reseps()
     {
-        return $this->belongsTo(Satuan::class, 'satuan_id', 'id_satuan');
+        return $this->belongsToMany(Resep::class, 'resep_obat')
+                    ->withPivot('jumlah', 'aturan_pakai', 'dosis')
+                    ->withTimestamps();  // Timestamps for pivot table
     }
 }

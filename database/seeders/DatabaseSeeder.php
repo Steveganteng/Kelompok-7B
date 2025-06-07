@@ -22,8 +22,8 @@ class DatabaseSeeder extends Seeder
             SatuanSeeder::class,
             LokasiSeeder::class,
             ObatSeeder::class,
-            ProdukKesehatanSeeder::class;
-            AlatKesehatanSeeder::class;
+            ProdukKesehatanSeeder::class,
+            AlatKesehatanSeeder::class,
 
 
         ]);

@@ -2,486 +2,617 @@
 <html lang="en">
 
 <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tambah keterangan berobat</title>
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet" />
+    <style>
+        /* General Stepper Layout */
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+        .step {
+            width: 25%;
+            text-align: center;
+            font-size: 0.875rem;
+        }
 
-    <title>Apotik Medicoal</title>
+        .step .icon {
+            display: inline-block;
+            background-color: #ccc;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            line-height: 35px;
+            color: white;
+            margin-bottom: 8px;
+        }
 
-    <!-- Custom fonts for this template-->
-    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+        .step.active .icon {
+            background-color: #4e73df;
+        }
 
-    <!-- Custom styles for this template-->
-    <link href="../css/sb-admin-2.min.css" rel="stylesheet">
+        .step.completed .icon {
+            background-color: #28a745;
+        }
 
+        .line {
+            height: 2px;
+            background: #ccc;
+            flex-grow: 1;
+            margin: 0 5px;
+            align-self: center;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background-color: #4e73df;
+            transition: width 0.3s ease;
+        }
+
+        .step h5 {
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+            font-size: 0.875rem;
+            padding: 0.4rem 0.75rem;
+        }
+
+        /* Form Input Sizes */
+        .form-control {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            height: auto;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            table-layout: fixed;
+            font-size: 0.875rem;
+        }
+
+        th, td {
+            text-align: center;
+            padding: 0.5rem;
+        }
+
+        th {
+            background-color: #f8f9fc;
+        }
+
+        /* Adjust spacing for smaller screen sizes */
+        @media (max-width: 768px) {
+            .stepper {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .step {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .line {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .form-control {
+                font-size: 0.875rem;
+                padding: 0.5rem;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            .btn-primary {
+                font-size: 0.875rem;
+                padding: 0.4rem 0.75rem;
+            }
+        }
+
+        /* Button styles for action buttons */
+        .btn {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-secondary {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-success {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-danger {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+    </style>
 </head>
 
 <body id="page-top">
-
-    <!-- Page Wrapper -->
     <div id="wrapper">
+        @include('layouts.navigation_dokter')
 
-        @include('../layouts/navigation_dokter')
-                <!-- End of Topbar -->
+        <div class="container-fluid mt-4">
+            <h1 class="h3 mb-4 text-gray-800">Input Pemeriksaan Pasien</h1>
 
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
+            <div class="card shadow p-4">
+                <form id="keteranganberobat-form" action="{{ route('keteranganberobat.store') }}" method="POST">
+                    @csrf
 
-                    <!-- Page Heading -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Keterangan Berobat</h1>
+                    <!-- Stepper Navigation -->
+                    <div class="stepper">
+                        <div class="step active" id="step1-nav">
+                            <div class="icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h5>Data Pasien</h5>
+                        </div>
+                        <div class="line"></div>
+                        <div class="step" id="step2-nav">
+                            <div class="icon">
+                                <i class="fas fa-notes-medical"></i>
+                            </div>
+                            <h5>Pemeriksaan</h5>
+                        </div>
+                        <div class="line"></div>
+                        <div class="step" id="step3-nav">
+                            <div class="icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <h5>Tindakan</h5>
+                        </div>
+                        <div class="line"></div>
+                        <div class="step" id="step4-nav">
+                            <div class="icon">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                            <h5>Resep Obat</h5>
+                        </div>
                     </div>
 
+                    <!-- Progress Bar -->
+                    <div class="progress mb-4">
+                        <div class="progress-bar" id="progress-bar" style="width: 25%;"></div>
+                    </div>
 
-                    <!-- Begin Page Content -->
-                    <div class="container-fluid">
+{{-- STEP 1: Data Pasien --}}
+<div class="form-step active" id="step1">
+    <div class="form-group">
+        <label>Nama Pasien</label>
+        <input name="nama_pasien" type="text" class="form-control" required />
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label>Jenis Kelamin</label>
+            <select name="jenis_kelamin" class="form-control" required>
+                <option value="">Pilih</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <label>Tempat Lahir</label>
+            <input name="tempat_lahir" type="text" class="form-control" required />
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label>Tanggal Lahir</label>
+            <input name="tanggal_lahir" type="date" class="form-control" id="tanggal-lahir" required />
+        </div>
+        <div class="form-group col-md-6">
+            <label>No. Telepon</label>
+            <input name="telepon" type="text" class="form-control" id="telepon" required />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Alamat</label>
+        <textarea name="alamat" rows="2" class="form-control" required></textarea>
+    </div>
+    <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-primary" onclick="goToStep(2)">Selanjutnya &rarr;</button>
+    </div>
+</div>
 
-                        <!-- Page Heading -->
-                        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                            <h1 class="h3 mb-0 text-gray-800">Input Pemeriksaan Pasien</h1>
-                        </div>
+{{-- STEP 2: Pemeriksaan --}}
+<div class="form-step" id="step2">
+    <h4 class="mb-4 text-primary">Pemeriksaan Pasien</h4>
 
-                        <div class="card shadow mb-4 p-4">
-                            <!-- Stepper Navigation -->
-                            <div class="mb-4 d-flex justify-content-between align-items-center text-center">
-                                <div class="step" id="step1-nav">
-                                    <div class="icon bg-primary text-white rounded-circle mb-2">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <small class="font-weight-bold"><br>Data Pasien</small>
-                                </div>
-                                <div class="line flex-grow-1 mx-2"></div>
-                                <div class="step" id="step2-nav">
-                                    <div class="icon bg-secondary text-white rounded-circle mb-2">
-                                        <i class="fas fa-notes-medical"></i>
-                                    </div>
-                                    <small>Pemeriksaan</small>
-                                </div>
-                                <div class="line flex-grow-1 mx-2"></div>
-                                <div class="step" id="step3-nav">
-                                    <div class="icon bg-secondary text-white rounded-circle mb-2">
-                                        <i class="fas fa-heartbeat"></i>
-                                    </div>
-                                    <small><br>Tindakan</small>
-                                </div>
-                                <div class="line flex-grow-1 mx-2"></div>
-                                <div class="step" id="step4-nav">
-                                    <div class="icon bg-secondary text-white rounded-circle mb-2">
-                                        <i class="fas fa-pills"></i>
-                                    </div>
-                                    <small><br>Resep Obat</small>
-                                </div>
-                            </div>
+    <!-- Grouped Fields for Date, Anamnesis, and Start of Treatment -->
+    <div class="form-row mb-3">
+        <div class="form-group col-md-6">
+            <label>Mulai Dirawat</label>
+            <input name="mulai_diwawati" type="datetime-local" class="form-control" required />
+        </div>
+        <div class="form-group col-md-6">
+            <label>Anamnesis</label>
+            <textarea name="anamnesis" rows="2" class="form-control"></textarea>
+        </div>
+    </div>
 
-                            <!-- STEP 1: Data Diri Pasien -->
-                            <div id="step1" class="container mt-4">
-                                <form>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Nama Pasien</label>
-                                            <input type="text" class="form-control mb-3" required>
+    <!-- Grouped Fields for Vital Signs (Tinggi, Berat, Suhu, Saturasi) -->
+    <div class="form-row mb-3">
+        <div class="form-group col-md-3">
+            <label>Tinggi (cm)</label>
+            <input name="tinggi_badan" type="number" class="form-control" min="0" required />
+        </div>
+        <div class="form-group col-md-3">
+            <label>Berat (kg)</label>
+            <input name="berat_badan" type="number" class="form-control" min="0" required />
+        </div>
+        <div class="form-group col-md-3">
+            <label>Suhu (°C)</label>
+            <input name="suhu_tubuh" type="number" step="0.1" class="form-control" min="0" required />
+        </div>
+        <div class="form-group col-md-3">
+            <label>Saturasi (%)</label>
+            <input name="saturasi_oksigen" type="number" class="form-control" min="0" required />
+        </div>
+    </div>
 
-                                            <label>Jenis Kelamin</label>
-                                            <select class="form-control mb-3" required>
+    <!-- Grouped Fields for Blood Pressure (Sistolik, Diastolik) and Pulse -->
+    <div class="form-row mb-3">
+        <div class="form-group col-md-3">
+            <label>Sistolik (mmHg)</label>
+            <input name="tekanan_darah_sistolik" type="number" class="form-control" min="0" required />
+        </div>
+        <div class="form-group col-md-3">
+            <label>Diastolik (mmHg)</label>
+            <input name="tekanan_darah_diastolik" type="number" class="form-control" min="0" required />
+        </div>
+        <div class="form-group col-md-3">
+            <label>Denyut Nadi</label>
+            <input name="nadi" type="number" class="form-control" min="0" required />
+        </div>
+        <div class="form-group col-md-3">
+            <label>Laju Pernapasan</label>
+            <input name="laju_pernapasan" type="number" class="form-control" min="0" required />
+        </div>
+    </div>
+
+    <!-- Additional Fields for Examination & Diagnosis -->
+    <div class="form-group mb-3">
+        <label>Pemeriksaan Penunjang</label>
+        <textarea name="pemeriksaan_penunjang" rows="2" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Obat yang Sudah Dikonsumsi</label>
+        <textarea name="obat_dikonsumsi_sebelumnya" rows="2" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group mb-3">
+        <label>Diagnosa</label>
+        <textarea name="diagnosa" rows="2" class="form-control" required></textarea>
+    </div>
+
+    <!-- Navigation Buttons with Equal Space Distribution -->
+    <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-secondary" onclick="goToStep(1)">&larr; Sebelumnya</button>
+        <button type="button" class="btn btn-primary" onclick="goToStep(3)">Selanjutnya &rarr;</button>
+    </div>
+</div>
+
+                    {{-- STEP 3: Tindakan Kesehatan --}}
+<div class="form-step" id="step3">
+    <h4 class="mb-3">Tindakan Kesehatan</h4>
+    <div class="d-flex justify-content-between">
+        <!-- Form Row for Tindakan -->
+        <div class="form-row" style="width: 45%; margin-right: 10px;">
+            <div class="form-group col-md-12">
+                <label>Nama Tindakan</label>
+                <input id="nama_tindakan" type="text" class="form-control" placeholder="Masukkan nama tindakan" />
+            </div>
+            <div class="form-group col-md-12">
+                <label>Nama Alat</label>
+                <select id="nama_alat" class="form-control">
                     <option value="">Pilih</option>
-                    <option value="Laki-laki">Laki-laki</option>
-                    <option value="Perempuan">Perempuan</option>
+                    @foreach($alatKesehatan as $alat)
+                        <option value="{{ $alat->id_AlatKesehatan }}">{{ $alat->nama }}</option>
+                    @endforeach
                 </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Jumlah</label>
+                <input id="jumlah_tindakan" type="number" class="form-control" value="1" min="1" />
+            </div>
+            <div class="form-group col-md-6">
+                <label>&nbsp;</label><br />
+                <button type="button" class="btn btn-success btn-block" onclick="tambahTindakan()">+ Tambah</button>
+            </div>
+        </div>
 
-                                            <label>Tempat Lahir</label>
-                                            <input type="text" class="form-control mb-3" required>
+        <!-- Table for Displaying Added Tindakan -->
+        <div class="table-container" style="width: 50%;">
+            <table class="table table-bordered mb-3">
+                <thead>
+                    <tr>
+                        <th>Tindakan</th>
+                        <th>Alat</th>
+                        <th>Jumlah</th>
+                        <th>Keterangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelTindakan">
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Belum ada.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-                                            <label>Tanggal Lahir</label>
-                                            <input type="date" class="form-control mb-3" required>
+    <input type="hidden" name="tindakan_data" id="tindakan_data" value="" />
 
-                                            <label>Alamat</label>
-                                            <textarea class="form-control mb-3" required></textarea>
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" onclick="goToStep(2)">&larr; Sebelumnya</button>
+        <button type="button" class="btn btn-primary" onclick="goToStep(4)">Selanjutnya &rarr;</button>
+    </div>
+</div>
 
-                                            <label>No. Telepon</label>
-                                            <input type="text" class="form-control mb-3" required>
-                                        </div>
 
-                                        <div class="col-md-6">
-                                            <label>ID Pemeriksaan</label>
-                                            <select class="form-control mb-3" required>
+                    {{-- STEP 4: Resep Obat --}}
+                    <div class="form-step" id="step4">
+    <h4 class="mb-3">Resep Obat</h4>
+    <div class="d-flex justify-content-between">
+        <!-- Form Row for Resep Obat -->
+        <div class="form-row" style="width: 45%; margin-right: 10px;">
+            <div class="form-group col-md-12">
+                <label>Nama Obat</label>
+                <select id="nama_dagang_obat" class="form-control">
                     <option value="">Pilih</option>
-                    <option value="rawatinap">Rawat Inap</option>
-                    <option value="rawatjalan">Rawat Jalan</option>
+                    @foreach($obats as $o)
+                        <option value="{{ $o->id_obat }}">{{ $o->nama_dagang_obat }}</option>
+                    @endforeach
                 </select>
-                                        </div>
-                                    </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label>Jumlah</label>
+                <input id="jumlah_obat" type="number" class="form-control" value="1" min="1" />
+            </div>
+            <div class="form-group col-md-6">
+                <label>Aturan Pakai</label>
+                <input type="text" id="aturan_pakai" name="aturan_pakai" class="form-control" placeholder="Contoh: 3× sehari" />
+            </div>
+            <div class="form-group col-md-6">
+                <label>Dosis</label>
+                <input type="text" id="dosis_obat" name="dosis_obat" class="form-control" placeholder="Contoh: 1 tablet" />
+            </div>
+            <div class="form-group col-md-6">
+                <label>&nbsp;</label><br />
+                <button type="button" class="btn btn-success btn-block" onclick="tambahObat()">+ Tambah</button>
+            </div>
+        </div>
 
-                                    <div class="text-right mt-4">
-                                        <button type="button" class="btn btn-primary rounded-pill" onclick="goToStep(2)">
-                Selanjutnya <i class="fas fa-arrow-right ml-1"></i>
-            </button>
-                                    </div>
-                                </form>
-                            </div>
+        <!-- Table for Displaying Added Obat -->
+        <div class="table-container" style="width: 50%;">
+            <table class="table table-bordered mb-4">
+                <thead>
+                    <tr>
+                        <th>Obat</th>
+                        <th>Jumlah</th>
+                        <th>Aturan Pakai</th>
+                        <th>Dosis</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelObat">
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Belum ada.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
+    <input type="hidden" name="resep_data" id="resep_data" value="" />
 
-                            <!-- STEP 2: Pemeriksaan -->
-                            <div id="step2" style="display: none;">
-                                <form>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Mulai Dirawat</label>
-                                            <input type="datetime-local" class="form-control mb-3" required>
+    <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" onclick="goToStep(3)">&larr; Sebelumnya</button>
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Simpan Data</button>
+    </div>
+</div>
 
-                                            <label>Anamnesis</label>
-                                            <textarea class="form-control mb-3"></textarea>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                                            <div class="form-row">
-                                                <div class="col">
-                                                    <label>Tinggi Badan</label>
-                                                    <div class="input-group mb-3">
-                                                        <input type="number" class="form-control" required>
-                                                        <div class="input-group-append"><span class="input-group-text">Cm</span></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <label>Berat Badan</label>
-                                                    <div class="input-group mb-3">
-                                                        <input type="number" class="form-control" required>
-                                                        <div class="input-group-append"><span class="input-group-text">Kg</span></div>
-                                                    </div>
-                                                </div>
-                                            </div>
+    <!-- Scripts -->
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        let alatKesehatan = [];
+        let resepList = [];
 
-                                            <label>Suhu Tubuh</label>
-                                            <div class="input-group mb-3">
-                                                <input type="number" step="0.1" class="form-control" required>
-                                                <div class="input-group-append"><span class="input-group-text">°C</span></div>
-                                            </div>
+        // Step Navigation Logic
+        function goToStep(step) {
+            [1, 2, 3, 4].forEach(i => {
+                document.getElementById('step' + i).style.display = (i === step ? 'block' : 'none');
+                document.querySelector(`#step${i}-nav .icon`)
+                    .classList.toggle('bg-primary', i === step);
+            });
 
-                                            <label>Saturasi Oksigen</label>
-                                            <div class="input-group mb-3">
-                                                <input type="number" class="form-control" required>
-                                                <div class="input-group-append"><span class="input-group-text">%</span></div>
-                                            </div>
+            // Update progress bar width
+            document.getElementById('progress-bar').style.width = (step * 25) + '%';
+        }
 
-                                            <label>Tekanan Darah</label>
-                                            <div class="form-row mb-3">
-                                                <div class="col"><input type="number" class="form-control" placeholder="Sistolik" required></div>
-                                                <div class="col-auto">/</div>
-                                                <div class="col"><input type="number" class="form-control" placeholder="Diastolik" required></div>
-                                                <div class="col-auto">mmHg</div>
-                                            </div>
+        // Add Tindakan
+        function tambahTindakan() {
+            const nama_tindakan = document.getElementById('nama_tindakan').value.trim();
+            const alat_id = document.getElementById('nama_alat').value;
+            const jumlah = parseInt(document.getElementById('jumlah_tindakan').value);
+            const keterangan = prompt('Keterangan (opsional):', '') || '';
 
-                                        </div>
+            if (!nama_tindakan || !alat_id || !jumlah || jumlah < 1) {
+                alert('Lengkapi data tindakan dengan benar!');
+                return;
+            }
 
-                                        <div class="col-md-6">
+            alatKesehatan.push({
+                nama_tindakan,
+                alat_id,
+                jumlah,
+                keterangan
+            });
 
-                                            <label>Denyut Nadi</label>
-                                            <div class="input-group mb-3">
-                                                <input type="number" class="form-control" required>
-                                                <div class="input-group-append"><span class="input-group-text">x/menit</span></div>
-                                            </div>
+            renderTindakan();
 
-                                            <label>Laju Pernapasan </label>
-                                            <div class="input-group mb-3">
-                                                <input type="number" class="form-control" required>
-                                                <div class="input-group-append"><span class="input-group-text">x/menit</span></div>
-                                            </div>
+            // Reset input
+            document.getElementById('nama_tindakan').value = '';
+            document.getElementById('nama_alat').value = '';
+            document.getElementById('jumlah_tindakan').value = 1;
+        }
 
-                                            <label>Pemeriksaan Penunjang</label>
-                                            <input type="text" class="form-control mb-3">
+        function renderTindakan() {
+            const tbody = document.getElementById('tabelTindakan');
+            tbody.innerHTML = '';
 
-                                            <label>Obat yang sudah dikonsumsi sebelumnya</label>
-                                            <textarea class="form-control mb-3"></textarea>
-                                            <label>Diagnosa </label>
-                                            <textarea class="form-control mb-3" required></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-between mt-4">
-                                        <button type="button" class="btn btn-secondary rounded-pill" onclick="goToStep(1)">
-                <i class="fas fa-arrow-left mr-1"></i> Sebelumnya
-            </button>
-                                        <button type="button" class="btn btn-primary rounded-pill" onclick="goToStep(3)">
-                Selanjutnya <i class="fas fa-arrow-right ml-1"></i>
-            </button>
-                                </form>
-                                </div>
-                            </div>
+            if (alatKesehatan.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Belum ada.</td></tr>`;
+                document.getElementById('tindakan_data').value = '';
+                return;
+            }
 
+            alatKesehatan.forEach((t, idx) => {
+                let namaAlat = '';
+                const option = document.querySelector(`#nama_alat option[value="${t.alat_id}"]`);
+                if (option) namaAlat = option.textContent;
 
-                            <!-- STEP 3: Tindakan -->
-                            <div id="step3" style="display: none;">
-                                <h4 class="mb-4">Tindakan</h4>
-                                <div class="row">
-                                    <!-- Form Input -->
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="tindakan">Nama Tindakan</label>
-                                            <select id="tindakan" class="form-control">
-                    <option value="">Pilih Tindakan</option>
-                    <option value="Ganti Perban">Ganti Perban</option>
-                    <option value="Pemasangan Infus">Pemasangan Infus</option>
-                </select>
-                                        </div>
+                tbody.insertAdjacentHTML('beforeend', `
 
-                                        <div class="form-group">
-                                            <label for="alat">Nama Alat Kesehatan</label>
-                                            <select id="alat" class="form-control">
-                    <option value="">Pilih alat kesehatan</option>
-                    <option value="Abocath 22 G (TERUMO)">Abocath 22 G (TERUMO)</option>
-                    <option value="Stetoskop">Stetoskop</option>
-                </select>
-                                        </div>
+                    <tr>
+                        <td>${t.nama_tindakan}</td>
+                        <td>${namaAlat}</td>
+                        <td>${t.jumlah}</td>
+                        <td>${t.keterangan}</td>
+                        <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusTindakan(${idx})">Hapus</button></td>
+                    </tr>
+                `);
+            });
 
-                                        <div class="form-group">
-                                            <label for="jumlah">Jumlah</label>
-                                            <input type="number" id="jumlah" value="1" class="form-control">
-                                        </div>
+            document.getElementById('tindakan_data').value = JSON.stringify(alatKesehatan);
+        }
 
-                                        <div class="form-group">
-                                            <label for="keterangan">Keterangan</label>
-                                            <textarea id="keterangan" class="form-control" rows="3"></textarea>
-                                        </div>
+        function hapusTindakan(index) {
+            alatKesehatan.splice(index, 1);
+            renderTindakan();
+        }
 
-                                        <button class="btn btn-success btn-sm" onclick="tambahTindakan()">+ Tambah</button>
-                                    </div>
+        // Add Obat
+        function tambahObat() {
+            const obat_id = document.getElementById('nama_dagang_obat').value;
+            const nama_dagang_obat = document.getElementById('nama_dagang_obat').selectedOptions[0]?.text || '';
+            const jumlah = parseInt(document.getElementById('jumlah_obat').value);
+            const aturan_pakai = document.getElementById('aturan_pakai').value.trim();
+            const dosis = document.getElementById('dosis_obat').value.trim();
 
-                                    <!-- Tabel -->
-                                    <div class="col-md-6">
-                                        <table class="table table-bordered">
-                                            <thead class="thead-light">
-                                                <tr>
-                                                    <th>Tindakan</th>
-                                                    <th>Alat Kesehatan</th>
-                                                    <th>Jumlah</th>
-                                                    <th>Keterangan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tabelTindakan">
-                                                <tr>
-                                                    <td colspan="4" class="text-center text-muted">
-                                                        Isi tabel tindakan dengan memasukkan data di form sebelah kiri.
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+            if (!obat_id || !aturan_pakai || !dosis || !jumlah || jumlah < 1) {
+                alert('Lengkapi data resep dengan benar!');
+                return;
+            }
 
-                                <!-- Tombol Navigasi -->
-                                <div class="d-flex justify-content-between mt-4">
-                                    <button class="btn btn-secondary rounded-pill" onclick="goToStep(2)">
-            <i class="fas fa-arrow-left mr-1"></i> Sebelumnya
-        </button>
-                                    <button class="btn btn-primary rounded-pill" onclick="goToStep(4)">
-            Selanjutnya <i class="fas fa-arrow-right ml-1"></i>
-        </button>
-                                </div>
-                            </div>
+            resepList.push({
+                obat_id,
+                nama_dagang_obat,
+                jumlah,
+                aturan_pakai,
+                dosis
+            });
 
+            renderObat();
 
+            // Reset input
+            document.getElementById('nama_dagang_obat').value = '';
+            document.getElementById('jumlah_obat').value = 1;
+            document.getElementById('aturan_pakai').value = '';
+            document.getElementById('dosis_obat').value = '';
+        }
 
-                            <!-- STEP 4: Resep Obat -->
-                            <!-- STEP 4 -->
-                            <div id="step4" style="display: none;">
-                                <div class="row">
-                                    <!-- Form Input Obat -->
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="nama_obat_4">Nama Obat</label>
-                                            <select class="form-control" id="nama_obat_4">
-            <option>Pilih Obat</option>
-            <!-- Tambahkan opsi obat di sini -->
-          </select>
-                                        </div>
+        function renderObat() {
+            const tbody = document.getElementById('tabelObat');
+            tbody.innerHTML = '';
 
-                                        <div class="form-group">
-                                            <label for="jumlah_obat_4">Jumlah Obat</label>
-                                            <div class="input-group">
-                                                <input type="number" class="form-control" id="jumlah_obat_4" placeholder="Masukkan jumlah penggunaan">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">Satuan</span>
-                                                </div>
-                                            </div>
-                                        </div>
+            if (resepList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Belum ada.</td></tr>`;
+                document.getElementById('resep_data').value = '';
+                return;
+            }
 
-                                        <div class="form-group">
-                                            <label for="aturan_pakai_4">Aturan Pakai</label>
-                                            <select class="form-control" id="aturan_pakai_4">
-            <option>Pilih aturan pakai</option>
-          </select>
-                                        </div>
+            resepList.forEach((r, idx) => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${r.nama_dagang_obat}</td>
+                        <td>${r.jumlah}</td>
+                        <td>${r.aturan_pakai}</td>
+                        <td>${r.dosis}</td>
+                        <td><button type="button" class="btn btn-danger btn-sm" onclick="hapusObat(${idx})">Hapus</button></td>
+                    </tr>
+                `);
+            });
 
-                                        <div class="form-group">
-                                            <label for="dosis_4">Dosis</label>
-                                            <select class="form-control" id="dosis_4">
-            <option>Pilih dosis</option>
-          </select>
-                                        </div>
+            document.getElementById('resep_data').value = JSON.stringify(resepList);
+        }
 
-                                        <!-- Tombol Tambah Obat -->
-                                        <button type="button" class="btn btn-success mt-2" onclick="tambahObatKeTabel()">
-          + Tambah Obat ke Resep
-        </button>
-                                    </div>
+        function hapusObat(index) {
+            resepList.splice(index, 1);
+            renderObat();
+        }
 
-                                    <!-- Tabel Data Obat -->
-                                    <div class="col-md-6">
-                                        <table class="table table-bordered" id="tabel_obat">
-                                            <thead>
-                                                <tr>
-                                                    <th>Nama Obat</th>
-                                                    <th>Jumlah</th>
-                                                    <th>Aturan Pakai</th>
-                                                    <th>Dosis</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tabel_obat_body">
-                                                <tr>
-                                                    <td colspan="4" class="text-center text-muted" id="pesan_kosong">
-                                                        Isi tabel tindakan dengan memasukkan data di form sebelah kiri.
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+        // Prevent negative numbers in input fields
+        const inputs = document.querySelectorAll('input[type="number"]');
+        inputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value < 0) e.target.value = 0;
+            });
+        });
 
-                                        <!-- Tombol Cetak Resep -->
-                                        <button type="button" class="btn btn-outline-primary" onclick="cetakResep()">
-          🖨️ Cetak Resep
-        </button>
-                                    </div>
-                                </div>
+        // Prevent non-numeric input
+        document.getElementById('telepon').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');  // Allow only digits
+        });
 
-                                <!-- Tombol Navigasi -->
-                                <div class="d-flex justify-content-between mt-4">
-                                    <button type="button" class="btn btn-secondary rounded-pill" onclick="goToStep(3)">
-        <i class="fas fa-arrow-left mr-1"></i> Sebelumnya
-      </button>
-                                    <button type="submit" class="btn btn-success rounded-pill">
-        <i class="fas fa-save mr-1"></i> Simpan Data
-    </button>
-                                </div>
-                            </div>
+        // Disable future dates for the birthdate input
+        document.getElementById('tanggal-lahir').setAttribute('max', new Date().toISOString().split('T')[0]);
 
-
-                            <!-- CSS stepper -->
-                            <style>
-                                .step {
-                                    width: 100px;
-                                    text-align: center;
-                                }
-
-                                .icon {
-                                    width: 40px;
-                                    height: 40px;
-                                    display: inline-flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    font-size: 18px;
-                                }
-
-                                .line {
-                                    height: 2px;
-                                    background-color: #ccc;
-                                }
-
-                                .step .icon.bg-primary {
-                                    background-color: #4e73df !important;
-                                }
-                            </style>
-
-                            <!-- JS step navigation -->
-                            <script>
-                                function goToStep(step) {
-                                    const totalSteps = 5;
-                                    for (let i = 1; i <= totalSteps; i++) {
-                                        const section = document.getElementById('step' + i);
-                                        if (section) {
-                                            section.style.display = (i === step) ? 'block' : 'none';
-                                        }
-
-                                        // Ganti warna ikon di stepper
-                                        const navIcon = document.querySelector(`#step${i}-nav .icon`);
-                                        if (navIcon) {
-                                            navIcon.classList.toggle('bg-primary', i === step);
-                                            navIcon.classList.toggle('bg-secondary', i !== step);
-                                        }
-                                    }
-                                }
-                            </script>
-
-
-
-
-
-
-                            <!-- End of Main Content -->
-
-                            <!-- Footer -->
-                            <footer class="sticky-footer bg-white">
-                                <div class="container my-auto">
-                                    <div class="copyright text-center my-auto">
-                                        <span>Copyright &copy; Your Website 2021</span>
-                                    </div>
-                                </div>
-                            </footer>
-                            <!-- End of Footer -->
-
-                        </div>
-                        <!-- End of Content Wrapper -->
-
-                    </div>
-                    <!-- End of Page Wrapper -->
-
-                    <!-- Scroll to Top Button-->
-                    <a class="scroll-to-top rounded" href="#page-top">
-                        <i class="fas fa-angle-up"></i>
-                    </a>
-
-                    <!-- Logout Modal-->
-                    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                                </div>
-                                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                                <div class="modal-footer">
-                                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                    <a class="btn btn-primary" href="login.html">Logout</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bootstrap core JavaScript-->
-                    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-                    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-                    <script>
-                        $(document).ready(function() {
-                            $('#dataTable').DataTable();
-                        });
-                    </script>
-
-                    <script src="../vendor/jquery/jquery.min.js"></script>
-                    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-                    <!-- Core plugin JavaScript-->
-                    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-                    <!-- Custom scripts for all pages-->
-                    <script src="../js/sb-admin-2.min.js"></script>
-
-                    <!-- Page level plugins -->
-                    <script src="../vendor/chart.js/Chart.min.js"></script>
-
-                    <!-- Page level custom scripts -->
-                    <script src="../js/demo/chart-area-demo.js"></script>
-                    <script src="../js/demo/chart-pie-demo.js"></script>
-
+        // Inisialisasi ke step 1
+        goToStep(1);
+    </script>
 </body>
 
 </html>

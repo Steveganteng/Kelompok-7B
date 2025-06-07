@@ -2,14 +2,12 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <title>Apotik Medicoal</title>
+    <title>Tambah Alat Kesehatan</title>
 
     <!-- Custom fonts for this template-->
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -17,131 +15,142 @@
 
     <!-- Custom styles for this template-->
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
-
 </head>
 
 <body id="page-top">
 
-    <!-- Page Wrapper -->
     <div id="wrapper">
-
         @include('../layouts/navigation_apoteker')
-        <div class="container">
-            <h1>Tambah Produk Kesehatan</h1>
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+        <div class="container-fluid">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Tambah Alat Kesehatan</h1>
+            </div>
 
-            <form action="{{ route('produkkesehatan.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <form method="POST" action="{{ route('alatkesehatan.store') }}" enctype="multipart/form-data">
+                        @csrf
 
-                {{-- Gambar --}}
-                <div class="form-group">
-                    <label for="gambar">Gambar Produk</label>
-                    <input type="file" name="gambar" id="gambar" class="form-control-file" accept="image/*">
-                </div>
+                        <!-- Nama Alat -->
+                        <div class="form-group">
+                            <label for="nama_alat">Nama Alat</label>
+                            <input type="text" name="nama_alat" id="nama_alat" class="form-control" required>
+                        </div>
 
-                {{-- Nama --}}
-                <div class="form-group">
-                    <label for="nama">Nama Produk</label>
-                    <input type="text" name="nama" id="nama" class="form-control" value="{{ old('nama') }}" required>
-                </div>
+                        <!-- Kode Alat -->
+                        <div class="form-group">
+                            <label for="kode_alat">Kode Alat</label>
+                            <input type="text" name="kode_alat" id="kode_alat" class="form-control" required>
+                        </div>
 
-                {{-- Satuan --}}
-                <div class="form-group">
-                    <label for="satuan_id">Satuan</label>
-                    <select name="satuan_id" class="form-control" required>
-                        <option value="">-- Pilih Satuan --</option>
-                        @foreach ($satuans as $s)
-                        <option value="{{ $s->id_satuan }}">{{ $s->nama_satuan }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                        <!-- Distributor Alat -->
+                        <div class="form-group">
+                            <label for="distributor_alat">Distributor Alat</label>
+                            <input type="text" name="distributor_alat" id="distributor_alat" class="form-control">
+                        </div>
 
+                        <!-- Stok -->
+                        <div class="form-group">
+                            <label for="stok">Stok</label>
+                            <input type="number" name="stok" id="stok" class="form-control" required>
+                        </div>
 
-                <div class="form-group mb-3">
-                    <label for="lokasi_id">Lokasi</label>
-                    <select name="lokasi_id" id="lokasi_id" class="form-control" required>
-                        @foreach(\App\Models\Lokasi::all() as $lokasi)
-                            <option value="{{ $lokasi->id_lokasi }}" {{ old('lokasi_id', $produk->lokasi_id ?? '') == $lokasi->id_lokasi ? 'selected' : '' }}>
-                                {{ $lokasi->area }} - Rak {{ $lokasi->rak }}, Baris {{ $lokasi->baris }}, Kolom {{ $lokasi->kolom }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                        <!-- Gambar -->
+                        <div class="form-group text-center">
+                            <label for="gambar">
+                                <img id="previewGambar" src="https://via.placeholder.com/150" class="img-thumbnail mb-3" style="cursor:pointer;" alt="Upload Gambar">
+                            </label>
+                            <input type="file" name="gambar" id="gambar" class="d-none" accept="image/*" onchange="loadPreview(this)">
+                            <small class="form-text text-muted">Klik gambar untuk upload foto alat</small>
+                        </div>
 
+                        <!-- Lokasi -->
+                        <div class="form-group">
+                            <label>Lokasi</label>
+                            <div class="form-row">
+                                <!-- Area -->
+                                <div class="col">
+                                    <select name="area" class="form-control" required>
+                                        <option value="">-- Pilih Area --</option>
+                                        @foreach($areas as $area)
+                                            <option value="{{ $area->area }}" {{ old('area') == $area->area ? 'selected' : '' }}>
+                                                {{ $area->area }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                {{-- Stok --}}
-                <div class="form-group">
-                    <label for="stok">Stok</label>
-                    <input type="number" name="stok" id="stok" class="form-control" min="0" value="{{ old('stok') }}" required>
-                </div>
+                                <!-- Rak -->
+                                <div class="col">
+                                    <select name="rak" class="form-control" required>
+                                        <option value="">-- Pilih Rak --</option>
+                                        @foreach($raks as $rak)
+                                            <option value="{{ $rak->rak }}" {{ old('rak') == $rak->rak ? 'selected' : '' }}>
+                                                {{ $rak->rak }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                <button type="submit" class="btn btn-primary">Simpan Produk</button>
-                <a href="{{ route('produkkesehatan.index') }}" class="btn btn-secondary">Batal</a>
-            </form>
-        </div>
-            <!-- End of Topbar -->
-            <!-- Main Content -->
-            <!-- Page Heading -->
-            <div class="container-fluid">
+                                <!-- Baris -->
+                                <div class="col">
+                                    <select name="baris" class="form-control" required>
+                                        <option value="">-- Pilih Baris --</option>
+                                        @foreach($bariss as $baris)
+                                            <option value="{{ $baris->baris }}" {{ old('baris') == $baris->baris ? 'selected' : '' }}>
+                                                {{ $baris->baris }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-            <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2021</span>
-                    </div>
-                </div>
-            </footer>
-            <!-- End of Footer -->
+                                <!-- Kolom -->
+                                <div class="col">
+                                    <select name="kolom" class="form-control" required>
+                                        <option value="">-- Pilih Kolom --</option>
+                                        @foreach($koloms as $kolom)
+                                            <option value="{{ $kolom->kolom }}" {{ old('kolom') == $kolom->kolom ? 'selected' : '' }}>
+                                                {{ $kolom->kolom }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
-        </div>
-        <!-- End of Content Wrapper -->
+                        <!-- Status -->
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control" required>
+                                <option value="Available">Available</option>
+                                <option value="Unavailable">Unavailable</option>
+                            </select>
+                        </div>
 
-    </div>
-    <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                        <button type="submit" class="btn btn-primary btn-block mt-4">
+                            <i class="fas fa-save"></i> Simpan Data
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#dataTable').DataTable();
-        });
+        function loadPreview(input) {
+            const preview = document.getElementById('previewGambar');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
     </script>
 
+    <!-- Bootstrap core JavaScript-->
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
@@ -150,14 +159,6 @@
 
     <!-- Custom scripts for all pages-->
     <script src="../js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="../vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="../js/demo/chart-area-demo.js"></script>
-    <script src="../js/demo/chart-pie-demo.js"></script>
-
 </body>
 
 </html>

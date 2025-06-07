@@ -1,265 +1,399 @@
+<!-- resources/views/apoteker/resepobat.blade.php -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Apotik Medicoal - Daftar Resep Obat</title>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet" />
 
-    <title>Apotik Medicoal</title>
+    <style>
+        #content {
+            min-height: 90vh;
+        }
 
-    <!-- Custom fonts for this template-->
-    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+        .btnResep {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.9rem;
+        }
 
-    <!-- Custom styles for this template-->
-    <link href="../css/sb-admin-2.min.css" rel="stylesheet">
+        .table-responsive {
+            overflow-x: auto;
+        }
 
+        table {
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            text-align: center;
+            padding: 0.75rem;
+        }
+
+        th {
+            background-color: #f8f9fc;
+        }
+
+        .badge-warning {
+            background-color: #ffcc00;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Custom styles for printable view */
+        @media print {
+            body {
+                font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            }
+
+            .modal-footer,
+            .btn,
+            .table th,
+            .table td {
+                display: none;
+            }
+
+            .print-container {
+                display: block;
+                padding: 20px;
+                text-align: left;
+            }
+
+            .print-container h2 {
+                color: #4e73df;
+                margin-bottom: 10px;
+            }
+
+            .print-container p {
+                font-size: 1.2rem;
+            }
+
+            .print-container strong {
+                color: #2e59d9;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table thead {
+                display: none;
+            }
+
+            .table,
+            .table tbody,
+            .table tr,
+            .table td {
+                display: block;
+                width: 100%;
+            }
+
+            .table td {
+                text-align: left;
+                padding: 10px 0;
+            }
+
+            .table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                padding-right: 10px;
+            }
+        }
+    </style>
 </head>
 
 <body id="page-top">
 
-    <!-- Page Wrapper -->
     <div id="wrapper">
+        @include('layouts.navigation_apoteker')
 
-        @include('../layouts/navigation_apoteker')
-            <!-- End of Topbar -->
-            <!-- Main Content -->
+        <div id="content-wrapper" class="d-flex flex-column">
 
-            <!-- Begin Page Content -->
-            <div class="container-fluid">
+            <div id="content" class="bg-light p-4">
+                <h1 class="h3 mb-4 text-gray-800 font-weight-bold">Daftar Resep Obat</h1>
 
-                <!-- Page Heading -->
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">Resep Obat</h1>
-                </div>
-                <!-- Tombol Tambah ID Resep Obat -->
-                <div class="mb-4 d-flex justify-content-end">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#inputIDModal">
-                        <i class="fas fa-plus"></i> Masukkan ID Resep Obat
-                    </button>
-                </div>
-                <!-- Modal Input ID Resep -->
-                <div class="modal fade" id="inputIDModal" tabindex="-1" role="dialog" aria-labelledby="inputIDModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content shadow">
-                            <div class="modal-header">
-                                <h5 class="modal-title font-weight-bold text-primary" id="inputIDModalLabel">Masukkan ID Resep Obat</h5>
-                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="formInputID">
-                                    <div class="form-group">
-                                        <label for="idResep">ID Resep Obat</label>
-                                        <input type="text" class="form-control" id="idResep" placeholder="Masukkan ID Resep">
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                <button type="submit" form="formInputID" class="btn btn-primary">Submit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <script>
-                    $(document).ready(function() {
-                        $('#formInputID').submit(function(e) {
-                            e.preventDefault();
-                            var idResep = $('#idResep').val();
-                            alert('ID Resep yang dimasukkan: ' + idResep);
-
-                            // TODO: Bisa kirim ke server lewat AJAX, atau redirect, dsb
-                            $('#inputIDModal').modal('hide');
-                        });
-                    });
-                </script>
-
-
-
-                <!-- Card Daftar Pasien -->
                 <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Daftar Pasien</h6>
-                    </div>
-                    <div class="card-body">
+                    <div class="card-body p-3">
                         <div class="table-responsive">
-                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <table class="table table-bordered table-hover" id="dataTable">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama Pasien</th>
-                                        <th>Umur</th>
-                                        <th>Jenis Kelamin</th>
-                                        <th>Tanggal Masuk</th>
-                                        <th>Aksi</th>
+                                        <th style="width:5%;">No</th>
+                                        <th style="width:25%;">Nama Pasien</th>
+                                        <th style="width:30%;">Nama Obat</th>
+                                        <th style="width:20%;">Status</th>
+                                        <th style="width:20%;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @foreach($reseps as $index => $resep)
                                     <tr>
-                                        <td>1</td>
-                                        <td>Andi Saputra</td>
-                                        <td>35</td>
-                                        <td>Laki-laki</td>
-                                        <td>2025-04-22</td>
+                                        <td class="text-center">{{ $index + 1 }}</td>
+                                        <td>{{ $resep->pasien->nama_pasien ?? '-' }}</td>
                                         <td>
-                                            <a href="#" class="btn btn-info btn-sm btnResep" data-nama="Andi Saputra" data-id="RJ24110013" data-tanggal="06/11/2024" data-diagnosa="DA08.0 - Dental caries">
+                                            @foreach($resep->obats as $obat)
+                                                {{ $obat->nama_dagang_obat ?? 'N/A' }}<br>
+                                            @endforeach
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge badge-{{ $resep->status == 'belum diberikan' ? 'warning' : 'success' }}">
+                                                {{ $resep->status }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-info btn-sm btnResep"
+                                                title="Lihat Detail Resep"
+                                                data-nama="{{ $resep->pasien->nama_pasien ?? 'N/A' }}"
+                                                data-obat="{{ $resep->obats->pluck('nama_dagang_obat')->join(', ') }}"
+                                                data-tanggal="{{ $resep->tanggal }}"
+                                                data-aturan="{{ $resep->obats->pluck('pivot.aturan_pakai')->join(', ') }}"
+                                                data-jumlah="{{ $resep->obats->pluck('pivot.jumlah')->join(', ') }}"
+                                                data-dosis="{{ $resep->obats->pluck('pivot.dosis')->join(', ') }}"
+                                                data-pasien-id="{{ $resep->pasien_id }}"
+                                                data-obat-id="{{ $resep->obats->pluck('id_obat')->join(', ') }}">
                                                 <i class="fas fa-file-prescription"></i>
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
-                                    <!-- Tambah pasien lain di sini -->
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modal Resep Obat -->
+                <!-- Modal Resep -->
                 <div class="modal fade" id="resepModal" tabindex="-1" role="dialog" aria-labelledby="resepModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title font-weight-bold text-primary" id="resepModalLabel">Informasi Pasien
-                                </h5>
-                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
+                                <h5 class="modal-title font-weight-bold text-primary" id="resepModalLabel">Detail Resep Obat</h5>
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Tutup">
+                                    <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <p><strong>Nama Pasien:</strong> <span id="namaPasien"></span></p>
-                                        <p><strong>ID Pemeriksaan:</strong> <span id="idPemeriksaan"></span></p>
-                                        <p><strong>Tanggal Pemeriksaan:</strong> <span id="tglPemeriksaan"></span></p>
-                                        <p><strong>Alergi:</strong> <span id="alergi">-</span></p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p><strong>Diagnosa:</strong> <span id="diagnosa"></span></p>
-                                    </div>
-                                </div>
-
-                                <div class="card shadow mb-3">
-                                    <div class="card-header py-2">
-                                        <strong>Daftar Resep Obat</strong>
-                                    </div>
-                                    <div class="card-body">
-                                        <p>R/ Cataflam 50 mg Tablet no 10</p>
-                                        <p>℞ 2 d.d 1 p.c.</p>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <textarea class="form-control" rows="3" placeholder="Masukkan catatan penyerahan obat"></textarea>
-                                    <div class="custom-control custom-checkbox small mt-2">
-                                        <input type="checkbox" class="custom-control-input" id="beritahuDokter">
-                                        <label class="custom-control-label" for="beritahuDokter">Beritahu Dokter</label>
-                                    </div>
-                                </div>
-
+                                <!-- Prescription Table -->
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 25%;">Detail</th>
+                                            <th>Data</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Nama Pasien:</strong></td>
+                                            <td><span id="namaPasien"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Nama Obat:</strong></td>
+                                            <td><span id="namaObat"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tanggal Resep:</strong></td>
+                                            <td><span id="tanggalResep"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Jumlah:</strong></td>
+                                            <td><span id="jumlahResep"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Aturan Pakai:</strong></td>
+                                            <td><span id="aturanPakai"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Dosis:</strong></td>
+                                            <td><span id="dosisResep"></span></td>
+                                        </tr>
+                                        <!-- Status Update Select -->
+                                        <tr>
+                                            <td><strong>Status:</strong></td>
+                                            <td>
+                                                <select id="updateStatus" class="form-control">
+                                                    <option value="belum diberikan">Belum Diberikan</option>
+                                                    <option value="sudah diberikan">Sudah Diberikan</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-success">Serahkan Obat</button>
+                                <button type="button" class="btn btn-primary" id="btnCetak"><i class="fas fa-print mr-1"></i> Cetak</button>
+                                <button type="button" class="btn btn-success" id="btnSerahkan"><i class="fas fa-check mr-1"></i> Serahkan</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                <button type="button" class="btn btn-warning" id="btnUpdateStatus"><i class="fas fa-sync-alt mr-1"></i> Update Status</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Script untuk Load Data ke Modal -->
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                <script>
-                    $(document).ready(function() {
-                        $('.btnResep').click(function() {
-                            var nama = $(this).data('nama');
-                            var id = $(this).data('id');
-                            var tanggal = $(this).data('tanggal');
-                            var diagnosa = $(this).data('diagnosa');
-
-                            $('#namaPasien').text(nama);
-                            $('#idPemeriksaan').text(id);
-                            $('#tglPemeriksaan').text(tanggal);
-                            $('#diagnosa').text(diagnosa);
-
-                            $('#resepModal').modal('show');
-                        });
-                    });
-                </script>
-
-
-
-
-                <!-- End of Main Content -->
-
-                <!-- Footer -->
-                <footer class="sticky-footer bg-white">
-                    <div class="container my-auto">
-                        <div class="copyright text-center my-auto">
-                            <span>Copyright &copy; Your Website 2021</span>
-                        </div>
-                    </div>
-                </footer>
-                <!-- End of Footer -->
-
             </div>
-            <!-- End of Content Wrapper -->
 
         </div>
-        <!-- End of Page Wrapper -->
 
-        <!-- Scroll to Top Button-->
-        <a class="scroll-to-top rounded" href="#page-top">
-            <i class="fas fa-angle-up"></i>
-        </a>
+    </div>
 
-        <!-- Logout Modal-->
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                        <a class="btn btn-primary" href="login.html">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Bootstrap & jQuery Scripts -->
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-        <!-- Bootstrap core JavaScript-->
-        <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-        <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $('#dataTable').DataTable();
+    <!-- DataTables -->
+    <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "ordering": true,
+                "lengthChange": true,
+                "pageLength": 10,
+                "language": {
+                    "search": "Cari:",
+                    "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                    "zeroRecords": "Data tidak ditemukan",
+                    "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                    "infoEmpty": "Tidak ada data tersedia",
+                    "infoFiltered": "(disaring dari _MAX_ total data)"
+                }
             });
-        </script>
 
-        <script src="../vendor/jquery/jquery.min.js"></script>
-        <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            $('.btnResep').on('click', function() {
+                $('#namaPasien').text($(this).data('nama'));
+                $('#namaObat').text($(this).data('obat'));
+                $('#tanggalResep').text($(this).data('tanggal'));
+                $('#aturanPakai').text($(this).data('aturan'));
+                $('#jumlahResep').text($(this).data('jumlah'));
+                $('#dosisResep').text($(this).data('dosis'));
+                $('#pasienID').text($(this).data('pasien-id'));
+                $('#obatID').text($(this).data('obat-id'));
+                $('#resepModal').modal('show');
+            });
 
-        <!-- Core plugin JavaScript-->
-        <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+            $('#btnCetak').on('click', function() {
+                var namaPasien = $('#namaPasien').text();
+                var namaObat = $('#namaObat').text();
+                var tanggalResep = $('#tanggalResep').text();
+                var aturanPakai = $('#aturanPakai').text();
+                var jumlahResep = $('#jumlahResep').text();
+                var dosisResep = $('#dosisResep').text();
 
-        <!-- Custom scripts for all pages-->
-        <script src="../js/sb-admin-2.min.js"></script>
+                var printWindow = window.open('', '', 'height=600,width=700');
+                printWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Cetak Resep</title>
+                        <style>
+                            body {
+                                font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                                padding: 30px;
+                                color: #333;
+                            }
+                            h2 {
+                                color: #4e73df;
+                                border-bottom: 3px solid #4e73df;
+                                padding-bottom: 10px;
+                                margin-bottom: 25px;
+                                font-weight: 700;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 20px;
+                            }
+                            table, th, td {
+                                border: 1px solid #ddd;
+                                padding: 8px;
+                                text-align: left;
+                            }
+                            th {
+                                background-color: #f8f9fc;
+                                color: #4e73df;
+                                font-weight: bold;
+                            }
+                            td {
+                                font-size: 1rem;
+                            }
+                            strong {
+                                color: #2e59d9;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h2>Detail Resep Obat</h2>
+                        <table>
+                            <tr>
+                                <th>Nama Pasien</th>
+                                <td>${namaPasien}</td>
+                            </tr>
+                            <tr>
+                                <th>Nama Obat</th>
+                                <td>${namaObat}</td>
+                            </tr>
+                            <tr>
+                                <th>Tanggal Resep</th>
+                                <td>${tanggalResep}</td>
+                            </tr>
+                            <tr>
+                                <th>Jumlah</th>
+                                <td>${jumlahResep}</td>
+                            </tr>
+                            <tr>
+                                <th>Aturan Pakai</th>
+                                <td>${aturanPakai}</td>
+                            </tr>
+                            <tr>
+                                <th>Dosis</th>
+                                <td>${dosisResep}</td>
+                            </tr>
+                        </table>
+                    </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+            });
 
-        <!-- Page level plugins -->
-        <script src="../vendor/chart.js/Chart.min.js"></script>
+            $('#btnUpdateStatus').on('click', function() {
+                var status = $('#updateStatus').val();
+                var resepId = $('#pasienID').text(); // Use this as the id of the resep
 
-        <!-- Page level custom scripts -->
-        <script src="../js/demo/chart-area-demo.js"></script>
-        <script src="../js/demo/chart-pie-demo.js"></script>
+                // Make an AJAX request to update the status, passing the id and status in the URL
+                $.ajax({
+                    url: '{{ route("updateStatus", ["id" => "ID", "status" => "STATUS"]) }}'.replace("ID", resepId).replace("STATUS", status),
+                    type: 'GET', // Use GET since the parameters are in the URL
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);
+                            $('#resepModal').modal('hide');
+                            // Optionally, update the status on the page without reloading
+                            $('#resepStatus' + resepId).text(status); // Update the displayed status
+                        } else {
+                            alert('Gagal memperbarui status.');
+                        }
+                    }
+                });
+            });
+
+            $('#btnSerahkan').on('click', function() {
+                alert('Resep sudah diserahkan!');
+                $('#resepModal').modal('hide');
+            });
+        });
+    </script>
 
 </body>
 

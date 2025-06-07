@@ -8,7 +8,8 @@ use App\Models\Golongan;
 use App\Models\Penanda;
 use App\Models\Lokasi;
 use App\Models\Satuan;
-
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ObatController extends Controller
 {
@@ -18,10 +19,10 @@ class ObatController extends Controller
     public function create()
     {
         return view('apoteker.tambah_dataobat', [
-            'golongans' => Golongan::all(),
-            'penandas'  => Penanda::all(),
-            'satuans'   => Satuan::all(),
-            'lokasis'   => Lokasi::all(),
+            'golongans'   => Golongan::all(),
+            'penandas'    => Penanda::all(),
+            'satuans'     => Satuan::all(),
+            'lokasis'     => Lokasi::all(),
         ]);
     }
 
@@ -30,139 +31,178 @@ class ObatController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $request->validate([
-            'NamaObat'     => 'required|string|max:255',
-            'isi_kemasan'  => 'required|string',
-            'bobot_isi'    => 'required|string',
-            'harga'        => 'required|numeric',
-            'stok'         => 'required|numeric',
-            'gambar'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'golongan_id'  => 'required|exists:golongan,id_golongan',
-            'penanda_id'   => 'required|exists:penanda,id_penanda',
-            'satuan_id'    => 'required|exists:satuan,id_satuan',
-            'area'         => 'required|string|max:255',
-            'rak'          => 'required|string|max:100',
-            'baris'        => 'required|integer',
-            'kolom'        => 'required|integer',
-            'deskripsi'    => 'nullable|string|max:255',
+            'nama_dagang_obat'   => 'required|string|max:255',
+            'nama_obat'          => 'required|string|max:255',
+            'distributor_obat'   => 'required|string|max:255',
+            'stok'               => 'required|integer',
+            'harga'              => 'required|numeric',
+            'bobot_isi'          => 'required|integer',
+            'deskripsi'          => 'nullable|string|max:255',
+            'tgl_kadaluarsa'     => 'required|date',
+            'gambar'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'golongan_id'        => 'required|exists:golongan,id_golongan',
+            'penanda_id'         => 'required|exists:penanda,id_penanda',
+            'satuan_id'          => 'required|exists:satuan,id_satuan',
+            'area'               => 'required|string|max:255',
+            'rak'                => 'required|string|max:100',
+            'baris'              => 'required|integer',
+            'kolom'              => 'required|integer',
         ]);
 
+        // Generate kode_obat if it's not provided
+        $kode_obat = $request->input('kode_obat') ?: 'OBT-' . strtoupper(uniqid());
+
         // Simpan atau ambil lokasi
-        $lokasi = Lokasi::firstOrCreate([
-            'area' => $request->area,
-            'rak' => $request->rak,
-            'baris' => $request->baris,
-            'kolom' => $request->kolom,
-        ], [
-            'deskripsi' => $request->deskripsi,
-        ]);
+        $lokasi = Lokasi::firstOrCreate(
+            [
+                'area'  => $validated['area'],
+                'rak'   => $validated['rak'],
+                'baris' => $validated['baris'],
+                'kolom' => $validated['kolom'],
+            ],
+            ['deskripsi' => $validated['deskripsi'] ?? null]
+        );
 
         // Upload gambar jika ada
         if ($request->hasFile('gambar')) {
             $validated['gambar'] = $request->file('gambar')->store('gambar-obat', 'public');
         }
 
-        // Simpan data obat
+        // Buat record baru
         Obat::create([
-            'NamaObat'    => $validated['NamaObat'],
-            'stok'        => $validated['stok'],
-            'harga'       => $validated['harga'],
-            'deskripsi'   => "{$validated['isi_kemasan']} / {$validated['bobot_isi']}",
-            'gambar'      => $validated['gambar'] ?? 'gambar-obat/default.png',
-            'golongan_id' => $validated['golongan_id'],
-            'penanda_id'  => $validated['penanda_id'],
-            'satuan_id'   => $validated['satuan_id'],
-            'lokasi_id'   => $lokasi->id_lokasi,
+            'kode_obat'          => $kode_obat, // Add generated kode_obat
+            'nama_dagang_obat'   => $validated['nama_dagang_obat'],
+            'nama_obat'          => $validated['nama_obat'],
+            'distributor_obat'   => $validated['distributor_obat'],
+            'stok'               => $validated['stok'],
+            'harga'              => $validated['harga'],
+            'bobot_isi'          => $validated['bobot_isi'],
+            'deskripsi'          => $validated['deskripsi'] ?? '',
+            'tgl_kadaluarsa'     => $validated['tgl_kadaluarsa'],
+            'gambar'             => $validated['gambar'] ?? 'gambar-obat/default.png',
+            'golongan_id'        => $validated['golongan_id'],
+            'penanda_id'         => $validated['penanda_id'],
+            'satuan_id'          => $validated['satuan_id'],
+            'lokasi_id'          => $lokasi->id_lokasi,
         ]);
 
-        return redirect()->route('dataobat')->with('success', 'Data obat berhasil disimpan.');
+        return redirect()->route('dataobat')
+                         ->with('success', 'Data obat berhasil disimpan.');
     }
+
+    /**
+     * Tampilkan form edit obat.
+     */
     public function edit($id)
     {
-        $obat = Obat::with(['golongan', 'penanda', 'lokasi', 'satuan'])->findOrFail($id);
-
-        $areaOptions = Lokasi::select('area')->distinct()->orderBy('area')->pluck('area');
-        $rakOptions = Lokasi::select('rak')->distinct()->orderBy('rak')->pluck('rak');
-        $barisOptions = Lokasi::select('baris')->distinct()->orderBy('baris')->pluck('baris');
-        $kolomOptions = Lokasi::select('kolom')->distinct()->orderBy('kolom')->pluck('kolom');
+        $obat = Obat::with(['golongan','penanda','lokasi','satuan'])
+                    ->findOrFail($id);
 
         return view('apoteker.edit_dataobat', [
-            'obat' => $obat,
-            'golongans' => Golongan::all(),
-            'penandas' => Penanda::all(),
-            'satuans' => Satuan::all(),
-            'areaOptions' => $areaOptions,
-            'rakOptions' => $rakOptions,
-            'barisOptions' => $barisOptions,
-            'kolomOptions' => $kolomOptions,
+            'obat'         => $obat,
+            'golongans'    => Golongan::all(),
+            'penandas'     => Penanda::all(),
+            'satuans'      => Satuan::all(),
+            'areaOptions'  => Lokasi::select('area')->distinct()->orderBy('area')->pluck('area'),
+            'rakOptions'   => Lokasi::select('rak')->distinct()->orderBy('rak')->pluck('rak'),
+            'barisOptions' => Lokasi::select('baris')->distinct()->orderBy('baris')->pluck('baris'),
+            'kolomOptions' => Lokasi::select('kolom')->distinct()->orderBy('kolom')->pluck('kolom'),
         ]);
     }
 
-
-
+    /**
+     * Update data obat.
+     */
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'NamaObat'     => 'required|string|max:255',
-            'isi_kemasan'  => 'required|string',
-            'bobot_isi'    => 'required|string',
-            'harga'        => 'required|numeric',
-            'stok'         => 'required|numeric',
-            'gambar'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'area'         => 'required|string|max:255',
-            'rak'          => 'required|string|max:100',
-            'baris'        => 'required|integer',
-            'kolom'        => 'required|integer',
-            'deskripsi'    => 'nullable|string|max:255',
+            'nama_dagang_obat'   => 'required|string|max:255',
+            'nama_obat'          => 'required|string|max:255',
+            'distributor_obat'   => 'required|string|max:255',
+            'stok'               => 'required|integer',
+            'harga'              => 'required|numeric',
+            'bobot_isi'          => 'required|integer',
+            'deskripsi'          => 'nullable|string|max:255',
+            'tgl_kadaluarsa'     => 'required|date',
+            'gambar'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'area'               => 'required|string|max:255',
+            'rak'                => 'required|string|max:100',
+            'baris'              => 'required|integer',
+            'kolom'              => 'required|integer',
         ]);
 
         $obat = Obat::findOrFail($id);
 
         // Update atau buat lokasi
-        $lokasi = Lokasi::firstOrCreate([
-            'area' => $request->area,
-            'rak' => $request->rak,
-            'baris' => $request->baris,
-            'kolom' => $request->kolom,
-        ], [
-            'deskripsi' => $request->deskripsi,
-        ]);
+        $lokasi = Lokasi::firstOrCreate(
+            [
+                'area'  => $validated['area'],
+                'rak'   => $validated['rak'],
+                'baris' => $validated['baris'],
+                'kolom' => $validated['kolom'],
+            ],
+            ['deskripsi' => $validated['deskripsi'] ?? null]
+        );
 
-        // Upload gambar jika ada
+        // Upload gambar baru jika ada
         if ($request->hasFile('gambar')) {
-            $gambarPath = $request->file('gambar')->store('gambar-obat', 'public');
-            $obat->gambar = $gambarPath;
+            $obat->gambar = $request->file('gambar')->store('gambar-obat', 'public');
         }
 
-        // Update data obat
+        // Simpan perubahan
         $obat->update([
-            'NamaObat'  => $validated['NamaObat'],
-            'stok'      => $validated['stok'],
-            'harga'     => $validated['harga'],
-            'deskripsi' => "{$validated['isi_kemasan']} / {$validated['bobot_isi']}",
-            'lokasi_id' => $lokasi->id_lokasi,
+            'nama_dagang_obat'  => $validated['nama_dagang_obat'],
+            'nama_obat'         => $validated['nama_obat'],
+            'distributor_obat'  => $validated['distributor_obat'],
+            'stok'              => $validated['stok'],
+            'harga'             => $validated['harga'],
+            'bobot_isi'         => $validated['bobot_isi'],
+            'deskripsi'         => $validated['deskripsi'] ?? '',
+            'tgl_kadaluarsa'    => $validated['tgl_kadaluarsa'],
+            'lokasi_id'         => $lokasi->id_lokasi,
         ]);
 
-        $obat->save();
-
-        return redirect()->route('dataobat')->with('success', 'Data obat berhasil diperbarui.');
+        return redirect()->route('dataobat')
+                         ->with('success', 'Data obat berhasil diperbarui.');
     }
 
     /**
-     * Tampilkan semua obat (untuk daftar).
+     * Daftar semua obat dengan pagination manual.
      */
     public function index(Request $request)
     {
         $search = $request->input('search');
 
-        $obats = Obat::with(['golongan', 'penanda', 'lokasi', 'satuan'])
-            ->when($search, function ($query, $search) {
-                return $query->where('NamaObat', 'like', '%' . $search . '%');
+        $collection = Obat::with(['golongan','penanda','lokasi','satuan'])
+            ->when($search, function($q) use ($search) {
+                return $q->where('nama_dagang_obat', 'like', "%{$search}%")
+                         ->orWhere('nama_obat', 'like', "%{$search}%");
             })
-            ->paginate(10)
-            ->withQueryString(); // supaya parameter search tetap ada saat berpindah halaman
+            ->get()
+            ->map(function($o) {
+                $o->kadaluarsa_warning = $o->tgl_kadaluarsa
+                    && $o->tgl_kadaluarsa->diffInDays(Carbon::now()) <= 7
+                    && ! $o->tgl_kadaluarsa->isPast();
+                return $o;
+            })
+            ->sortByDesc('kadaluarsa_warning')
+            ->values();
 
-        return view('apoteker.dataobat', compact('obats', 'search'));
+        // Pagination manual
+        $page    = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $paginated = new LengthAwarePaginator(
+            $collection->forPage($page, $perPage),
+            $collection->count(),
+            $perPage,
+            $page,
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
+        );
+
+        return view('apoteker.dataobat', [
+            'obats'  => $paginated,
+            'search' => $search,
+        ]);
     }
 }

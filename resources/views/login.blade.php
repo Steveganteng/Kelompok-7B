@@ -2,101 +2,232 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Klinik Medicoal - Login</title>
 
-    <!-- Custom fonts for this template-->
-    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+    <!-- Custom fonts -->
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700" rel="stylesheet" />
 
-    <!-- Custom styles for this template-->
-    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <!-- Custom styles -->
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet" />
+
+    <style>
+        /* Background gradasi very soft abu */
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(180deg, #fff 0%, #f5f7fa 100%);
+            color: #343A40;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        /* Card dengan border biru lembut dan shadow halus */
+        .card {
+            max-width: 440px;
+            width: 100%;
+            border-radius: 16px;
+            border: 1.8px solid #c7d0e0; /* biru sangat lembut */
+            background-color: #fff;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(26, 54, 93, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 30px rgba(26, 54, 93, 0.15);
+        }
+
+        .card-body {
+            padding: 3rem 3rem;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-wrapper img {
+            width: 100px;
+            user-select: none;
+        }
+
+        h1 {
+            font-weight: 700;
+            color: #1A365D;
+            font-size: 1.8rem;
+            letter-spacing: 0.02em;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Input dengan border bawah dan efek fokus */
+        .form-control-user {
+            border: none;
+            border-bottom: 2px solid #E9ECEF;
+            border-radius: 0;
+            padding: 10px 12px;
+            font-size: 1rem;
+            background-color: transparent;
+            color: #343A40;
+            box-shadow: none !important;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control-user::placeholder {
+            color: #6c757d;
+            opacity: 1;
+        }
+
+        .form-control-user:focus {
+            border-bottom-color: #1A365D;
+            outline: none;
+            box-shadow: none !important;
+            background-color: transparent;
+        }
+
+        /* Button dengan gradien lembut */
+        .btn-primary.btn-user.btn-block {
+            background: linear-gradient(90deg, #1A365D 0%, #3b5998 100%);
+            border: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 14px 0;
+            border-radius: 10px;
+            letter-spacing: 0.04em;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 12px rgba(26, 54, 93, 0.3);
+            color: #fff;
+            user-select: none;
+        }
+
+        .btn-primary.btn-user.btn-block:hover,
+        .btn-primary.btn-user.btn-block:focus {
+            background: linear-gradient(90deg, #3b5998 0%, #1A365D 100%);
+            box-shadow: 0 8px 18px rgba(26, 54, 93, 0.5);
+            color: #fff;
+        }
+
+        /* Checkbox label */
+        .custom-control-label {
+            font-weight: 600;
+            color: #1A365D;
+            user-select: none;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .custom-control-label:hover {
+            color: #16325C;
+        }
+
+        .custom-control-input:checked~.custom-control-label::before {
+            background-color: #1A365D;
+            border-color: #1A365D;
+            box-shadow: none !important;
+        }
+
+        /* Alert */
+        .alert-danger {
+            border-radius: 10px;
+            border: 1.5px solid #DC3545;
+            background-color: #F8D7DA;
+            color: #842029;
+            font-weight: 600;
+            box-shadow: none !important;
+            margin-top: 1.5rem;
+        }
+
+        /* Links */
+        .text-center a.small {
+            color: #1A365D;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .text-center a.small:hover {
+            color: #16325C;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 2rem 2rem;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-gradient-primary">
+<body>
 
     <div class="container">
 
-        <!-- Outer Row -->
-        <div class="row justify-content-center">
+        <div class="card o-hidden border-0">
+            <div class="card-body">
+                <div class="logo-wrapper">
+                    <img src="{{ asset('img/logo.png') }}" alt="Logo Klinik" />
+                </div>
+                <h1>Selamat Datang di Klinik Medicoal</h1>
 
-            <div class="col-xl-10 col-lg-12 col-md-9">
-
-                <div class="card o-hidden border-0 shadow-lg my-5">
-                    <div class="card-body p-0">
-                        <!-- Nested Row within Card Body -->
-                        <div class="row">
-                            <div class="col-lg-6 d-none d-lg-block bg-login-image"
-                                 style="background-image: url('{{ asset('img/logo.png') }}'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
-                            <div class="col-lg-6">
-                                <div class="p-5">
-                                    <div class="text-center mb-4">
-                                        <img src="{{ asset('img/logo.png') }}" alt="Logo Klinik" style="width: 100px;">
-                                        <h1 class="h4 text-gray-900 mt-2">Selamat Datang di Klinik Medicoal</h1>
-                                    </div>
-                                    <form class="user" method="POST" action="/login">
-                                        @csrf
-                                        <div class="form-group">
-                                            <input type="email" class="form-control form-control-user"
-                                                   name="email" placeholder="Enter Email Address..." required autofocus>
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="password" class="form-control form-control-user"
-                                                   name="password" placeholder="Password" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck" name="remember">
-                                                <label class="custom-control-label" for="customCheck">Remember Me</label>
-                                            </div>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-user btn-block">
-                                            Login
-                                        </button>
-
-                                        @if($errors->any())
-                                            <div class="alert alert-danger mt-2">
-                                                <ul>
-                                                    @foreach ($errors->all() as $error)
-                                                        <li>{{ $error }}</li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                        @endif
-
-                                        @if(session('error'))
-                                            <div class="alert alert-danger mt-2">
-                                                {{ session('error') }}
-                                            </div>
-                                        @endif
-                                    </form>
-
-                                    <hr>
-                                    <div class="text-center">
-                                        <a class="small" href="#">Lupa Password?</a>
-                                    </div>
-                                    <div class="text-center">
-                                        <a class="small" href="#">Buat Akun Baru!</a>
-                                    </div>
-                                </div>
-                            </div>
+                <form class="user" method="POST" action="/login" autocomplete="off" novalidate>
+                    @csrf
+                    <div class="form-group mb-4">
+                        <input type="email" class="form-control form-control-user" name="email" placeholder="Masukkan Email" required autofocus />
+                    </div>
+                    <div class="form-group mb-4">
+                        <input type="password" class="form-control form-control-user" name="password" placeholder="Masukkan Password" required />
+                    </div>
+                    <div class="form-group mb-4">
+                        <div class="custom-control custom-checkbox small">
+                            <input type="checkbox" class="custom-control-input" id="customCheck" name="remember" />
+                            <label class="custom-control-label" for="customCheck">Ingat Saya</label>
                         </div>
                     </div>
+
+                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                        Login
+                    </button>
+
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                </form>
+
+                <hr />
+
+                <div class="text-center mt-3">
+                    <a class="small" href="#">Lupa Password?</a>
                 </div>
-
             </div>
-
         </div>
 
     </div>
-
 
     <!-- Bootstrap core JavaScript-->
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>

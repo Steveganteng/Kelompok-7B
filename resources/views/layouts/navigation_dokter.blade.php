@@ -3,7 +3,7 @@
 
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/dokter') }}">
-        <div class="sidebar-brand-icon">
+        <div class="sidebar-brand-icon" href="{{ url('/dokter.dashboard') }}" >
             <img src="{{ asset('img/logo.png') }}" alt="Logo" style="width: 80px; height: auto;">
         </div>
     </a>
