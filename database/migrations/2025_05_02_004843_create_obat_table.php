@@ -26,18 +26,14 @@ return new class extends Migration
             $table->integer('harga');
             $table->integer('bobot_isi');
             $table->string('gambar');
-
             // Tambah distributor
             $table->string('distributor_obat');
-
             // Foreign keys
             $table->unsignedBigInteger('golongan_id');
             $table->unsignedBigInteger('penanda_id');
             $table->unsignedBigInteger('lokasi_id');
             $table->unsignedBigInteger('satuan_id');
-
             $table->date('tgl_kadaluarsa');
-
             // Constraints
             $table->foreign('golongan_id')
                   ->references('id_golongan')->on('golongan')

@@ -17,6 +17,7 @@ public function up()
         $table->string('nama_pasien');
         $table->date('tanggal_lahir');
         $table->string('jenis_kelamin');
+        $table->string('jenis_pemeriksaan');
         $table->string('alamat');
         $table->string('telepon');
         $table->timestamps();

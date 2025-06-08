@@ -22,28 +22,83 @@ class ResepController extends Controller
     }
 
     /**
+     * Store a newly created prescription.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        // Create a new prescription and set the default status to 'belum diberikan'
+        $resep = new Resep();
+        $resep->tanggal = $request->tanggal;
+        $resep->deskripsi = $request->deskripsi;
+        $resep->jenis_rawat = $request->jenis_rawat;
+        $resep->user_id = $request->user_id;
+        $resep->pasien_id = $request->pasien_id;
+        $resep->status = 'belum diberikan'; // Set the default status
+
+        // Save the prescription
+        $resep->save();
+
+        // Optionally, you can attach related medications (obats)
+        if ($request->has('obat_id')) {
+            $resep->obats()->attach($request->obat_id, [
+                'jumlah' => $request->jumlah,
+                'aturan_pakai' => $request->aturan_pakai,
+                'dosis' => $request->dosis
+            ]);
+        }
+
+        return back()->with('success', 'Resep berhasil dibuat dengan status "belum diberikan".');
+    }
+
+    /**
+     * Update the status of the prescription to 'sudah diberikan' (given).
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function serahkan($id)
+    {
+        // Find the prescription
+        $resep = Resep::find($id);
+
+        if ($resep) {
+            // Update the status to 'sudah diberikan'
+            $resep->status = 'sudah diberikan';
+            $resep->save();
+            return back()->with('success', 'Resep berhasil diserahkan.');
+        }
+
+        return back()->with('error', 'Resep tidak ditemukan.');
+    }
+
+    /**
      * Update the status of the prescription.
      *
      * @param  int  $id
      * @param  string  $status
      * @return \Illuminate\Http\Response
      */
-    public function updateStatus($id, $status)
-    {
+    public function updateStatus(Request $request, $id)
+{
+    $resep = Resep::find($id);
+
+    if ($resep) {
+        $status = $request->input('status');  // Get status from request
+
         // Validate status
         if (!in_array($status, ['belum diberikan', 'sudah diberikan'])) {
-            return back()->with('error', 'Status tidak valid.');
+            return response()->json(['error' => 'Status tidak valid.'], 400);
         }
 
-        // Find the prescription
-        $resep = Resep::find($id);
+        $resep->status = $status;
+        $resep->save();
 
-        if ($resep) {
-            $resep->status = $status;
-            $resep->save();
-            return back()->with('success', 'Status resep berhasil diperbarui.');
-        }
-
-        return back()->with('error', 'Resep tidak ditemukan.');
+        return response()->json(['success' => 'Status resep berhasil diperbarui.']);
     }
+
+}
+
 }

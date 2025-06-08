@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -17,8 +18,10 @@ class AuthController extends Controller
 
         // Coba login
         if (Auth::attempt($credentials)) {
+            // Regenerate the session to prevent session fixation
             $request->session()->regenerate();
 
+            // Get the authenticated user
             $user = Auth::user();
 
             // Arahkan berdasarkan role
@@ -29,11 +32,18 @@ class AuthController extends Controller
             } elseif ($user->role === 'superadmin') {
                 return redirect('/admin/dashboard');
             } else {
+                // Log out the user if the role is unrecognized
                 Auth::logout();
+                // Optionally, log the failed attempt for debugging
+                Log::warning("Login attempt with unrecognized role for email: {$user->email}");
                 return back()->withErrors(['email' => 'Role tidak dikenali.']);
             }
         }
 
+        // Log failed login attempt
+        Log::warning("Failed login attempt for email: {$request->email}");
+
+        // Return back with error if login fails
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->withInput();
@@ -44,6 +54,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/');
     }
 }

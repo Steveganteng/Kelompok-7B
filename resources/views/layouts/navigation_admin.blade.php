@@ -10,6 +10,13 @@
 
     <hr class="sidebar-divider">
 
+<li class="nav-item">
+        <a class="nav-link" href="{{ route('admin.createUser') }}">
+            <i class="fas fa-users"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
     <!-- Heading -->
     <div class="sidebar-heading">
         Manajemen Data
@@ -17,25 +24,9 @@
 
     <!-- Daftar Akun -->
     <li class="nav-item">
-        <a class="nav-link" href="{{ url('/akun') }}">
+        <a class="nav-link" href="{{ route('admin.createUser') }}">
             <i class="fas fa-users"></i>
             <span>Daftar Akun</span>
-        </a>
-    </li>
-
-    <!-- Daftar Pasien -->
-    <li class="nav-item">
-        <a class="nav-link" href="{{ url('/pasien') }}">
-            <i class="fas fa-user-injured"></i>
-            <span>Daftar Pasien</span>
-        </a>
-    </li>
-
-    <!-- Daftar Resep -->
-    <li class="nav-item">
-        <a class="nav-link" href="{{ url('/resep') }}">
-            <i class="fas fa-file-prescription"></i>
-            <span>Daftar Resep</span>
         </a>
     </li>
 

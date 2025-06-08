@@ -1,7 +1,5 @@
 <?php
 
-// app/Models/Resep.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,29 +14,29 @@ class Resep extends Model
 
     protected $fillable = [
         'tanggal',
-        'status',
+        'deskripsi',
         'jenis_rawat',
         'user_id',
         'pasien_id',
-        'jumlah',
-        'aturan_pakai',
-        'dosis',
     ];
 
-    // Many-to-many relationship with Obat (Pivot relationship)
+    // Define many-to-many relationship with Obat
     public function obats()
     {
         return $this->belongsToMany(Obat::class, 'resep_obat', 'resep_id', 'obat_id')
-                    ->withPivot('jumlah', 'aturan_pakai', 'dosis');
+                    ->withPivot('jumlah', 'aturan_pakai', 'dosis', 'status')  // Including 'status' in the pivot data
+                    ->withTimestamps();
     }
 
-    // Relasi ke Pasien (setiap baris resep berkaitan dengan satu pasien)
+    // Define the relationship with User
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Define the relationship with Pasien
     public function pasien()
     {
-        return $this->belongsTo(Pasien::class, 'pasien_id', 'id_pasien');
-    }
-     public function user()
-    {
-        return $this->belongsTo(Pasien::class, 'user_id', 'id_user');
+        return $this->belongsTo(Pasien::class, 'pasien_id');
     }
 }

@@ -62,8 +62,7 @@
                                           method="POST" class="d-inline"
                                           onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                                         @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm">Hapus</button>
+
                                     </form>
                                 </td>
                             </tr>

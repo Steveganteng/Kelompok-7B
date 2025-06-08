@@ -21,6 +21,7 @@ class ResepObat extends Model
         'jumlah',
         'aturan_pakai',
         'dosis',
+        'status',  // Include the new 'status' column here
     ];
 
     // Define the relationship with Resep

@@ -7,6 +7,7 @@ use App\Models\Golongan;
 use App\Models\Satuan;
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
 
@@ -79,10 +80,10 @@ class ProdukKesehatanController extends Controller
             'golongan_id'                => 'required|exists:golongan,id_golongan',
             'satuan_id'                  => 'required|exists:satuan,id_satuan',
             'gambar'                     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'area'                      => 'required|string|max:255',
-            'rak'                       => 'required|string|max:255',
-            'baris'                     => 'required|string|max:255',
-            'kolom'                     => 'required|string|max:255',
+            'area'                       => 'required|string|max:255',
+            'rak'                        => 'required|string|max:255',
+            'baris'                      => 'required|string|max:255',
+            'kolom'                      => 'required|string|max:255',
         ]);
 
         // Cari atau buat lokasi baru
@@ -141,10 +142,10 @@ class ProdukKesehatanController extends Controller
             'golongan_id'                => 'required|exists:golongan,id_golongan',
             'satuan_id'                  => 'required|exists:satuan,id_satuan',
             'gambar'                     => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'area'                      => 'required|string|max:255',
-            'rak'                       => 'required|string|max:255',
-            'baris'                     => 'required|string|max:255',
-            'kolom'                     => 'required|string|max:255',
+            'area'                       => 'required|string|max:255',
+            'rak'                        => 'required|string|max:255',
+            'baris'                      => 'required|string|max:255',
+            'kolom'                      => 'required|string|max:255',
         ]);
 
         // Cari atau buat lokasi baru
@@ -166,5 +167,78 @@ class ProdukKesehatanController extends Controller
         ]));
 
         return redirect()->route('produkkesehatan.index')->with('success', 'Produk kesehatan berhasil diperbarui.');
+    }
+
+    public function uploadFile(Request $request)
+    {
+        // Validasi file
+        $request->validate([
+            'file' => 'required|mimes:csv,xlsx,txt', // Validasi jenis file yang diterima
+        ]);
+
+        // Ambil file yang diupload
+        $file = $request->file('file');
+
+        // Proses file CSV atau Excel menggunakan Laravel Excel
+        $data = Excel::toArray([], $file);
+
+        // Iterasi melalui data yang dibaca dari file (data berada dalam array pertama)
+        foreach ($data[0] as $index => $row) {
+            // Lewati baris pertama yang berisi header
+            if ($index == 0) continue;
+
+            // Ensure the row has enough columns before accessing them
+            if (isset($row[12], $row[13], $row[14], $row[15], $row[16])) {
+                // Generate kode_produkkesehatan if not present
+                $kode_produkkesehatan = 'PROD-' . strtoupper(uniqid());
+
+                // Create or get the location if it doesn't exist
+                $lokasi = Lokasi::firstOrCreate(
+                    [
+                        'area'  => $row[12],  // Area Lokasi
+                        'rak'   => $row[13],  // Rak
+                        'baris' => (int)$row[14],  // Baris
+                        'kolom' => (int)$row[15],  // Kolom
+                    ],
+                    ['deskripsi' => $row[16] ?? null]  // Deskripsi Lokasi (if exists)
+                );
+
+                // Continue with the rest of the process (Golongan, Satuan, etc.)
+                $golongan = Golongan::where('NamaGolongan', $row[4])->first();
+                if ($golongan) {
+                    $golongan_id = $golongan->id_golongan;
+                } else {
+                    continue;  // Skip to next row if Golongan is not found
+                }
+
+                $satuan = Satuan::where('nama_satuan', $row[6])->first();
+                if ($satuan) {
+                    $satuan_id = $satuan->id_satuan;
+                } else {
+                    continue;  // Skip to next row if Satuan is not found
+                }
+
+                // Save the new ProdukKesehatan record
+                ProdukKesehatan::create([
+                    'kode_produkkesehatan'    => $kode_produkkesehatan,
+                    'nama_produkkesehatan'    => $row[1],  // Nama Produk Kesehatan
+                    'stok'                     => (int)$row[9],  // Stok
+                    'harga'                    => (float)$row[8],  // Harga
+                    'bobot_isi'                => (int)$row[7],  // Bobot Isi (mg)
+                    'distributor_produkkesehatan' => $row[3],  // Distributor Produk Kesehatan
+                    'tgl_kadaluarsa'           => $row[10],  // Tanggal Kadaluarsa
+                    'gambar'                   => 'gambar-produkkesehatan/default.png',  // Gambar Produk Kesehatan
+                    'golongan_id'              => $golongan_id,  // Golongan
+                    'satuan_id'                => $satuan_id,  // Satuan
+                    'lokasi_id'                => $lokasi->id_lokasi,  // Lokasi
+                ]);
+            } else {
+                // Handle case where required columns are missing, maybe log or skip the row
+                continue; // Skip this row if it doesn't have the expected columns
+            }
+        }
+
+        return redirect()->route('produkkesehatan.index')
+                ->with('success', 'Data Produk Kesehatan berhasil diimpor dan disimpan.');
     }
 }

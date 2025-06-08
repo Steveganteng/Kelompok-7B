@@ -60,19 +60,6 @@
     <form action="{{ route('simpan_dataobat') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
-        <!-- Preview & Upload Gambar -->
-        <div class="form-group text-center">
-            <img id="previewGambar"
-                 src="https://via.placeholder.com/150"
-                 alt="Preview Gambar Obat"
-                 class="img-fluid img-thumbnail mb-3"
-                 style="max-width:200px; max-height:200px; object-fit:cover;">
-            <input type="file" name="gambar" id="uploadGambar" accept="image/*" class="d-none" onchange="loadPreview(this)">
-            <button type="button" class="btn btn-secondary" onclick="$('#uploadGambar').click()">
-                <i class="fas fa-upload"></i> Pilih Gambar
-            </button>
-            <small class="form-text text-muted">Max 2MB, JPG/JPEG/PNG</small>
-        </div>
 
         <!-- Nama Dagang -->
         <div class="form-group">
@@ -208,6 +195,19 @@
             <textarea name="deskripsi_lokasi" class="form-control" rows="2"
                       placeholder="Keterangan tambahan lokasi..."></textarea>
         </div>
+        <!-- Preview & Upload Gambar -->
+        <div class="form-group text-center">
+            <img id="previewGambar"
+                 src="https://via.placeholder.com/150"
+                 alt="Preview Gambar Obat"
+                 class="img-fluid img-thumbnail mb-3"
+                 style="max-width:200px; max-height:200px; object-fit:cover;">
+            <input type="file" name="gambar" id="uploadGambar" accept="image/*" class="d-none" onchange="loadPreview(this)">
+            <button type="button" class="btn btn-secondary" onclick="$('#uploadGambar').click()">
+                <i class="fas fa-upload"></i> Pilih Gambar
+            </button>
+            <small class="form-text text-muted">Max 2MB, JPG/JPEG/PNG</small>
+        </div>
 
         <button type="submit" class="btn btn-primary btn-block mt-4">
             <i class="fas fa-save"></i> Simpan Data
@@ -216,19 +216,33 @@
 </div>
 
                         <!-- Tab 2: Upload File -->
-                        <div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
-                            <form>
-                                <div class="form-group">
-                                    <label>Upload File (CSV/XLSX)</label>
-                                    <input type="file" class="form-control-file" accept=".csv, .xlsx" required>
-                                    <small class="form-text text-muted">Pastikan file sesuai format template.</small>
-                                </div>
+                        <!-- Tab 2: Upload File -->
+<!-- Tab 2: Upload File -->
+<div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
+    <form action="{{ route('upload.obat') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="form-group">
+            <label>Upload File (CSV/XLSX)</label>
+            <input type="file" name="file" class="form-control-file" accept=".csv, .xlsx" required>
+            <small class="form-text text-muted">Pastikan file sesuai format template.</small>
+        </div>
 
-                                <button type="submit" class="btn btn-primary btn-block mt-4">
-                                    <i class="fas fa-upload"></i> Upload File
-                                </button>
-                            </form>
-                        </div>
+        <button type="submit" class="btn btn-primary btn-block mt-4">
+            <i class="fas fa-upload"></i> Upload File
+        </button>
+    </form>
+
+    <!-- Button to Download Template -->
+    <div class="mt-4">
+        <a href="https://docs.google.com/spreadsheets/d/1-PXZPmnL8ZPtrdSIT5SIb0rPqe8JYfyZ/edit?gid=2006717613"
+           target="_blank" class="btn btn-success btn-block">
+            <i class="fas fa-download"></i> Download Template
+        </a>
+    </div>
+</div>
+
+
+
 
                     </div>
                 </div>

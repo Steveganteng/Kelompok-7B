@@ -9,6 +9,7 @@ use App\Models\Penanda;
 use App\Models\Lokasi;
 use App\Models\Satuan;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ObatController extends Controller
@@ -88,7 +89,7 @@ class ObatController extends Controller
         ]);
 
         return redirect()->route('dataobat')
-                         ->with('success', 'Data obat berhasil disimpan.');
+            ->with('success', 'Data obat berhasil disimpan.');
     }
 
     /**
@@ -96,8 +97,8 @@ class ObatController extends Controller
      */
     public function edit($id)
     {
-        $obat = Obat::with(['golongan','penanda','lokasi','satuan'])
-                    ->findOrFail($id);
+        $obat = Obat::with(['golongan', 'penanda', 'lokasi', 'satuan'])
+            ->findOrFail($id);
 
         return view('apoteker.edit_dataobat', [
             'obat'         => $obat,
@@ -164,7 +165,7 @@ class ObatController extends Controller
         ]);
 
         return redirect()->route('dataobat')
-                         ->with('success', 'Data obat berhasil diperbarui.');
+            ->with('success', 'Data obat berhasil diperbarui.');
     }
 
     /**
@@ -174,13 +175,13 @@ class ObatController extends Controller
     {
         $search = $request->input('search');
 
-        $collection = Obat::with(['golongan','penanda','lokasi','satuan'])
-            ->when($search, function($q) use ($search) {
+        $collection = Obat::with(['golongan', 'penanda', 'lokasi', 'satuan'])
+            ->when($search, function ($q) use ($search) {
                 return $q->where('nama_dagang_obat', 'like', "%{$search}%")
-                         ->orWhere('nama_obat', 'like', "%{$search}%");
+                    ->orWhere('nama_obat', 'like', "%{$search}%");
             })
             ->get()
-            ->map(function($o) {
+            ->map(function ($o) {
                 $o->kadaluarsa_warning = $o->tgl_kadaluarsa
                     && $o->tgl_kadaluarsa->diffInDays(Carbon::now()) <= 7
                     && ! $o->tgl_kadaluarsa->isPast();
@@ -204,5 +205,93 @@ class ObatController extends Controller
             'obats'  => $paginated,
             'search' => $search,
         ]);
+    }
+
+    public function uploadFile(Request $request)
+    {
+        // Validasi file
+        $request->validate([
+            'file' => 'required|mimes:csv,xlsx,txt',
+        ]);
+
+        // Ambil file CSV
+        $file = $request->file('file');
+
+        // Proses file CSV menggunakan Laravel Excel
+        $data = Excel::toArray([], $file);
+        // dd($data);
+
+        // Iterasi melalui data yang dibaca dari file (data berada dalam array pertama)
+        foreach ($data[0] as $index => $row) {
+            // Lewati baris pertama yang berisi header
+            if ($index == 0) continue;
+
+            // Generate kode_obat jika tidak ada
+            $kode_obat = 'OBT-' . strtoupper(uniqid());
+
+            // Buat atau ambil lokasi (jika tidak ada)
+            $lokasi = Lokasi::firstOrCreate(
+                [
+                    'area'  => $row[12],  // Area Lokasi
+                    'rak'   => $row[13],  // Rak
+                    'baris' => (int)$row[14],  // Baris
+                    'kolom' => (int)$row[15],  // Kolom
+                ],
+                ['deskripsi' => $row[16] ?? null]  // Deskripsi Lokasi
+            );
+
+            $golongan = Golongan::where('NamaGolongan', $row[4])->first(); // Use first() to get a single model
+
+            if ($golongan) {
+                $golongan_id = $golongan->id_golongan;  // Access the id_golongan of the first record
+                // Dump and die to check the result
+            } else {
+                return; // If no result is found
+            }
+
+
+            $penanda = Penanda::where('nama_penanda', $row[5])->first();
+            // dd('haisss');
+            if ($penanda) {
+                $penanda_id = $penanda->id_penanda;  // Access the id_golongan of the first record
+                // dd($penanda_id);
+                // Dump and die to check the result
+            } else {
+                return; // If no result is found
+
+            }
+            $satuan = Satuan::where('nama_satuan',  $row[6])->first();
+
+            if ($satuan) {
+                $satuan_id = $satuan->id_satuan;
+                // dd($satuan_id);
+            } else {
+                dd('kososng');
+            }
+
+
+
+            // Simpan data obat ke dalam database
+            Obat::create([
+                'kode_obat'          => $kode_obat,
+                'nama_dagang_obat'   => $row[1],  // Nama Dagang Obat
+                'nama_obat'          => $row[2],  // Nama Generik Obat
+                'distributor_obat'   => $row[3],  // Distributor Obat
+                'stok'               => (int)$row[9],  // Stok
+                'harga'              => (float)$row[8],  // Harga
+                'bobot_isi'          => (int)$row[7],  // Bobot Isi (mg)
+                'deskripsi'          => $row[11] ?? '',  // Deskripsi Obat
+                'tgl_kadaluarsa'     => $row[10],
+                'gambar'             => 'gambar-obat/default.png',  // Tanggal Kadaluarsa
+                'golongan_id'        => $golongan_id,  // Golongan
+                'penanda_id'         => $penanda_id,  // Penanda
+                'satuan_id'          => $satuan_id,  // Satuan Kemasan
+                'lokasi_id'          => $lokasi->id_lokasi,  // Lokasi
+            ]);
+
+
+        }
+        return redirect()->route('dataobat')
+                ->with('success', 'Data obat berhasil diimpor dan disimpan.');
     }
 }

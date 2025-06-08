@@ -20,12 +20,7 @@ use App\Http\Controllers\keteranganberobatController;
 use App\Http\Controllers\pemeriksaankesehatanController;
 use App\Http\Controllers\narkotikaalkoholController;
 use App\Http\Controllers\rawatinapController;
-
-
-
-
-
-
+use App\Http\Controllers\UserController;
 
 
 
@@ -52,8 +47,9 @@ Route::get('/apoteker/dashboard', function () {
 Route::get('/dokter/dashboard', function () {
     return view('dokter.index');
 });
-
-Route::view('/dashboard_admin', 'admin.dashboard_admin');
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard_admin');
+});
 
 
 // ====== Routes untuk Apoteker ======
@@ -63,6 +59,8 @@ Route::get('/tambah_dataobat', [ObatController::class, 'create'])->name('tambah_
 Route::post('/simpan_dataobat', [ObatController::class, 'store'])->name('simpan_dataobat');
 Route::get('/edit_dataobat/{id}', [ObatController::class, 'edit'])->name('edit_dataobat');
 Route::put('/update_dataobat/{id}', [ObatController::class, 'update'])->name('update_dataobat');
+Route::post('/upload-obat', [ObatController::class, 'uploadFile'])->name('upload.obat');
+
 
 Route::get('/dataobat', [ObatController::class, 'index'])->name('dataobat');
 Route::get('/tambah_dataobat', [ObatController::class, 'create'])->name('tambah_dataobat');
@@ -78,6 +76,9 @@ Route::put('/alatkesehatan/{id}', [AlatKesehatanController::class, 'update'])->n
 Route::post('/alatkesehatan/{id}/update-status', [AlatKesehatanController::class, 'updateStatus'])->name('alatkesehatan.updateStatus');
 
 
+Route::post('/alatkesehatan/upload-file', [AlatKesehatanController::class, 'uploadFile'])->name('alatkesehatan.uploadFile');
+
+
 
 
 Route::get('/produkkesehatan', [ProdukKesehatanController::class, 'index'])->name('produkkesehatan.index');
@@ -85,6 +86,8 @@ Route::get('/produkkesehatan/create', [ProdukKesehatanController::class, 'create
 Route::post('/produkkesehatan', [ProdukKesehatanController::class, 'store'])->name('produkkesehatan.store');
 Route::get('/produkkesehatan/{id}/edit', [ProdukKesehatanController::class, 'edit'])->name('produkkesehatan.edit');
 Route::put('/produkkesehatan/{id}', [ProdukKesehatanController::class, 'update'])->name('produkkesehatan.update');
+Route::post('/produkkesehatan/upload-file', [ProdukKesehatanController::class, 'uploadFile'])->name('produkkesehatan.uploadFile');
+
 
 
 Route::view('/dashboard_apoteker', 'apoteker.dashboard_apoteker');
@@ -94,8 +97,7 @@ Route::view('/golonganobat', 'apoteker.golonganobat');
 Route::view('/lokasiobat', 'apoteker.lokasiobat');
 Route::view('/penandaobat', 'apoteker.penandaobat');
 Route::view('/satuanobat', 'apoteker.satuanobat');
-Route::view('/tambah_alatkesehatan', 'apoteker.tambah_alatkesehatan');Route::view('/tambah_produkkesehatan', 'apoteker.tambah_produkkesehatan');
-Route::patch('/alatkesehatan/{id}/update-status', [AlatKesehatanController::class, 'updateStatus'])->name('alatkesehatan.updateStatus');
+
 
 
 Route::get('/golonganobat', [GolonganObatController::class, 'index'])->name('golongan_obat.index');
@@ -124,7 +126,8 @@ Route::put('/lokasiobat/{id}', [LokasiController::class, 'update'])->name('lokas
 
 
 Route::get('/resepobat', [ResepController::class, 'index'])->name('resep.index');
-Route::get('/resep/update-status/{id}/{status}', [ResepController::class, 'updateStatus'])->name('updateStatus');
+Route::post('/update-status/{id}', [ResepController::class, 'updateStatus'])->name('updateStatus');
+Route::get('/serahkan/{id}', [ResepController::class, 'serahkan'])->name('serahkan');
 
 
 // ====== Routes untuk Dokter ======
@@ -159,3 +162,10 @@ Route::view('/tambah_resepobat', 'dokter.tambah_resepobat');
 Route::get('/rawatjalan', [RawatJalanController::class, 'index'])->name('rawatjalan.index');
 Route::get('/tambah_rawatjalan', [RawatJalanController::class, 'create'])->name('rawatjalan.create');
 Route::post('/tambah_rawatjalan', [RawatJalanController::class, 'store'])->name('rawatjalan.store');
+
+
+
+// Route untuk menampilkan form create user
+Route::get('/admin/create-user', [UserController::class, 'create'])->name('admin.createUser');
+// Route untuk menyimpan user baru
+Route::post('/admin/store-user', [UserController::class, 'store'])->name('admin.storeUser');
