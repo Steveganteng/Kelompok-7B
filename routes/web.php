@@ -21,6 +21,8 @@ use App\Http\Controllers\pemeriksaankesehatanController;
 use App\Http\Controllers\narkotikaalkoholController;
 use App\Http\Controllers\rawatinapController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+
 
 
 
@@ -47,10 +49,11 @@ Route::get('/apoteker/dashboard', function () {
 Route::get('/dokter/dashboard', function () {
     return view('dokter.index');
 });
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard_admin');
-});
+Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard_admin');
 
+// User management routes
+Route::get('/admin/create-user', [UserController::class, 'create'])->name('admin.createUser');
+Route::post('/admin/store-user', [UserController::class, 'store'])->name('admin.storeUser');
 
 // ====== Routes untuk Apoteker ======
 
@@ -126,8 +129,9 @@ Route::put('/lokasiobat/{id}', [LokasiController::class, 'update'])->name('lokas
 
 
 Route::get('/resepobat', [ResepController::class, 'index'])->name('resep.index');
-Route::post('/update-status/{id}', [ResepController::class, 'updateStatus'])->name('updateStatus');
-Route::get('/serahkan/{id}', [ResepController::class, 'serahkan'])->name('serahkan');
+Route::get('/resep/update-status/{id}/{status}', [ResepController::class, 'updateStatus'])->name('updateStatus');
+Route::get('/resep/serahkan/{id}', [ResepController::class, 'serahkan'])->name('serahkan');
+
 
 
 // ====== Routes untuk Dokter ======
@@ -165,7 +169,3 @@ Route::post('/tambah_rawatjalan', [RawatJalanController::class, 'store'])->name(
 
 
 
-// Route untuk menampilkan form create user
-Route::get('/admin/create-user', [UserController::class, 'create'])->name('admin.createUser');
-// Route untuk menyimpan user baru
-Route::post('/admin/store-user', [UserController::class, 'store'])->name('admin.storeUser');

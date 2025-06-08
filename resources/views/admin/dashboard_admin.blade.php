@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -10,7 +9,6 @@
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet" />
 </head>
-
 <body id="page-top">
     <div id="wrapper">
         @include('layouts.navigation_admin')
@@ -20,94 +18,110 @@
                 <div class="container-fluid py-4">
                     <h1 class="h3 mb-4 text-gray-800">Dashboard Admin</h1>
 
-                    <!-- Daftar Pasien -->
-                    <div class="card shadow mb-4">
-                        <div class="card-body">
-                            <h5 class="mb-3 font-weight-bold">Daftar Pasien</h5>
-                            <div class="table-responsive">
-                                <table class="table table-bordered" width="100%" cellspacing="0">
-                                    <thead class="thead-light text-center">
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama Pasien</th>
-                                            <th>Tanggal Lahir</th>
-                                            <th>Jenis Kelamin</th>
-                                            <th>Telepon</th>
-                                            <th>Alamat</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-center">1</td>
-                                            <td>Dr. Aulia Pratama</td>
-                                            <td>01 Juni 2025</td>
-                                            <td>Laki-laki</td>
-                                            <td>08123456789</td>
-                                            <td>Jl. Raya No. 1, Jakarta</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-center">2</td>
-                                            <td>Siti Nurhaliza</td>
-                                            <td>05 Juni 2025</td>
-                                            <td>Perempuan</td>
-                                            <td>08234567890</td>
-                                            <td>Jl. Merdeka No. 5, Bandung</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-center">3</td>
-                                            <td>John Doe</td>
-                                            <td>10 Mei 2025</td>
-                                            <td>Laki-laki</td>
-                                            <td>08345678901</td>
-                                            <td>Jl. Sudirman No. 12, Surabaya</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                    <!-- Dashboard Stats Cards -->
+                    <div class="row">
+                        <!-- Pasien Card -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Pasien</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pasienCount }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Obat Card -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Obat</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $obatCount }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-pills fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alat Kesehatan Card -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Alat Kesehatan</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $alatKesehatanCount }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-medkit fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Produk Kesehatan Card -->
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-danger shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                                Produk Kesehatan</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $produkKesehatanCount }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-boxes fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Daftar Resep -->
+                    <!-- Table for Obat with Stok < 50 and Tanggal Kadaluarsa within 2 months -->
                     <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Obat with Low Stock and Expiring Soon</h6>
+                        </div>
                         <div class="card-body">
-                            <h5 class="mb-3 font-weight-bold">Daftar Resep</h5>
                             <div class="table-responsive">
-                                <table class="table table-bordered" width="100%" cellspacing="0">
-                                    <thead class="thead-light text-center">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
                                         <tr>
-                                            <th>No</th>
-                                            <th>Nama Pasien</th>
+                                            <th>Kode Obat</th>
+                                            <th>Nama Dagang</th>
                                             <th>Nama Obat</th>
-                                            <th>Tanggal Resep</th>
-                                            <th>Jumlah</th>
-                                            <th>Aturan Pakai</th>
+                                            <th>Stok</th>
+                                            <th>Tanggal Kadaluarsa</th>
+                                            <th>Deskripsi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td class="text-center">1</td>
-                                            <td>Dr. Aulia Pratama</td>
-                                            <td>Paracetamol</td>
-                                            <td>01 Juni 2025</td>
-                                            <td>2</td>
-                                            <td>3x sehari</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-center">2</td>
-                                            <td>Siti Nurhaliza</td>
-                                            <td>Amoxicillin</td>
-                                            <td>05 Juni 2025</td>
-                                            <td>1</td>
-                                            <td>2x sehari</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-center">3</td>
-                                            <td>John Doe</td>
-                                            <td>Ibuprofen</td>
-                                            <td>10 Mei 2025</td>
-                                            <td>3</td>
-                                            <td>1x sehari</td>
-                                        </tr>
+                                        @foreach($obats as $obat)
+                                            <tr>
+                                                <td>{{ $obat->kode_obat }}</td>
+                                                <td>{{ $obat->nama_dagang_obat }}</td>
+                                                <td>{{ $obat->nama_obat }}</td>
+                                                <td>{{ $obat->stok }}</td>
+                                                <td>{{ $obat->tgl_kadaluarsa->format('d-m-Y') }}</td>
+                                                <td>{{ $obat->deskripsi }}</td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -138,5 +152,4 @@
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
 
 </body>
-
 </html>

@@ -81,24 +81,22 @@ class ResepController extends Controller
      * @param  string  $status
      * @return \Illuminate\Http\Response
      */
-    public function updateStatus(Request $request, $id)
-{
-    $resep = Resep::find($id);
-
-    if ($resep) {
-        $status = $request->input('status');  // Get status from request
-
+    public function updateStatus($id, $status)
+    {
         // Validate status
         if (!in_array($status, ['belum diberikan', 'sudah diberikan'])) {
-            return response()->json(['error' => 'Status tidak valid.'], 400);
+            return back()->with('error', 'Status tidak valid.');
         }
 
-        $resep->status = $status;
-        $resep->save();
+        // Find the prescription
+        $resep = Resep::find($id);
 
-        return response()->json(['success' => 'Status resep berhasil diperbarui.']);
+        if ($resep) {
+            $resep->status = $status;
+            $resep->save();
+            return back()->with('success', 'Status resep berhasil diperbarui.');
+        }
+
+        return back()->with('error', 'Resep tidak ditemukan.');
     }
-
-}
-
 }

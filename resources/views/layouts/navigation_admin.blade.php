@@ -10,12 +10,13 @@
 
     <hr class="sidebar-divider">
 
-<li class="nav-item">
-        <a class="nav-link" href="{{ route('admin.createUser') }}">
-            <i class="fas fa-users"></i>
-            <span>Dashboard</span>
-        </a>
-    </li>
+   <li class="nav-item">
+    <a class="nav-link" href="{{ route('admin.dashboard_admin') }}">
+        <i class="fas fa-user"></i>
+        <span>Dashboard</span>
+    </a>
+</li>
+
 
     <!-- Heading -->
     <div class="sidebar-heading">
@@ -29,6 +30,9 @@
             <span>Daftar Akun</span>
         </a>
     </li>
+
+
+
 
     <hr class="sidebar-divider d-none d-md-block">
 
