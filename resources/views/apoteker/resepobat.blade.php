@@ -50,6 +50,7 @@
             padding: 20px;
         }
 
+        /* Custom styles for printable view */
         @media print {
             body {
                 font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -131,37 +132,41 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($reseps as $index => $resep)
-                                        <tr>
-                                            <td class="text-center">{{ $index + 1 }}</td>
-                                            <td>{{ $resep->pasien->nama_pasien ?? '-' }}</td>
-                                            <td>
-                                                @foreach($resep->obats as $obat)
-                                                    {{ $obat->nama_dagang_obat ?? 'N/A' }}<br>
-                                                @endforeach
-                                            </td>
-                                            <td class="text-center">
-                                                <span class="badge badge-{{ $obat->pivot->status == 'belum diberikan' ? 'warning' : 'success' }}">
-                                                    Status: {{ $obat->pivot->status ?? 'N/A' }}
-                                                </span><br>
-                                            </td>
-                                            <td class="text-center">
-                                                <button class="btn btn-info btn-sm btnResep"
-                                                        title="Lihat Detail Resep"
-                                                        data-nama="{{ $resep->pasien->nama_pasien ?? 'N/A' }}"
-                                                        data-tanggal="{{ $resep->tanggal }}"
-                                                        data-obat="{{ $resep->obats->pluck('nama_dagang_obat')->join(', ') }}"
-                                                        data-jumlah="{{ $resep->obats->pluck('pivot.jumlah')->join(', ') }}"
-                                                        data-aturan="{{ $resep->obats->pluck('pivot.aturan_pakai')->join(', ') }}"
-                                                        data-dosis="{{ $resep->obats->pluck('pivot.dosis')->join(', ') }}"
-                                                        data-status="{{ $resep->status }}"
-                                                        data-pasien-id="{{ $resep->pasien_id }}"
-                                                        data-obat-id="{{ $resep->obats->pluck('id_obat')->join(', ') }}">
-                                                    <i class="fas fa-file-prescription"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                 @foreach($reseps as $index => $resep)
+    <tr>
+        <td class="text-center">{{ $index + 1 }}</td>
+        <td>{{ $resep->pasien->nama_pasien ?? '-' }}</td>
+        <td>
+            @foreach($resep->obats as $obat)
+                {{ $obat->nama_dagang_obat ?? 'N/A' }}<br>
+
+            @endforeach
+        </td>
+        <td class="text-center">
+            <!-- Display status in the 'Status' column -->
+            <span class="badge badge-{{ $obat->pivot->status == 'belum diberikan' ? 'warning' : 'success' }}">
+                    Status: {{ $obat->pivot->status ?? 'N/A' }}
+                </span><br>
+        </td>
+        <td class="text-center">
+            <button class="btn btn-info btn-sm btnResep"
+                title="Lihat Detail Resep"
+                data-nama="{{ $resep->pasien->nama_pasien ?? 'N/A' }}"
+                data-obat="{{ $resep->obats->pluck('nama_dagang_obat')->join(', ') }}"
+                data-tanggal="{{ $resep->tanggal }}"
+                data-aturan="{{ $resep->obats->pluck('pivot.aturan_pakai')->join(', ') }}"
+                data-jumlah="{{ $resep->obats->pluck('pivot.jumlah')->join(', ') }}"
+                data-dosis="{{ $resep->obats->pluck('pivot.dosis')->join(', ') }}"
+                data-status="{{ $resep->status }}"
+                data-pasien-id="{{ $resep->pasien_id }}"
+                data-obat-id="{{ $resep->obats->pluck('id_obat')->join(', ') }}">
+                <i class="fas fa-file-prescription"></i>
+            </button>
+        </td>
+    </tr>
+@endforeach
+
+
                                 </tbody>
                             </table>
                         </div>
@@ -169,71 +174,78 @@
                 </div>
 
                 <!-- Modal Resep -->
-                <div class="modal fade" id="resepModal" tabindex="-1" role="dialog" aria-labelledby="resepModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title font-weight-bold text-primary" id="resepModalLabel">Detail Resep Obat</h5>
-                                <button class="close" type="button" data-dismiss="modal" aria-label="Tutup">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 25%;">Detail</th>
-                                            <th>Data</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>Nama Pasien:</strong></td>
-                                            <td><span id="namaPasien"></span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Tanggal Resep:</strong></td>
-                                            <td><span id="tanggalResep"></span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <!-- New Table for Medication Details -->
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 25%;">Nama Obat</th>
-                                            <th style="width: 25%;">Jumlah</th>
-                                            <th style="width: 25%;">Aturan Pakai</th>
-                                            <th style="width: 25%;">Dosis</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="medicationDetails">
-                                        <!-- Data will be inserted dynamically using JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" id="btnCetak">
-                                    <i class="fas fa-print mr-1"></i> Cetak
-                                </button>
-                                <button type="button" class="btn btn-success" id="btnSerahkan">
-                                    <i class="fas fa-check mr-1"></i> Serahkan
-                                </button>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+<div class="modal fade" id="resepModal" tabindex="-1" role="dialog" aria-labelledby="resepModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold text-primary" id="resepModalLabel">Detail Resep Obat</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Tutup">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <!-- Prescription Table -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Detail</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Nama Pasien:</strong></td>
+                            <td><span id="namaPasien"></span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tanggal Resep:</strong></td>
+                            <td><span id="tanggalResep"></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- New Table for Medication Details -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Nama Obat</th>
+                            <th style="width: 25%;">Jumlah</th>
+                            <th style="width: 25%;">Aturan Pakai</th>
+                            <th style="width: 25%;">Dosis</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medicationDetails">
+                        <!-- Data will be inserted dynamically using JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+           <div class="modal-footer">
+    <!-- Print Button -->
+     <button type="button" class="btn btn-primary" id="btnCetak">
+                    <i class="fas fa-print mr-1"></i> Cetak
+                </button>
+    <!-- Mark as 'Given' (Serahkan) Button -->
+    <button type="button" class="btn btn-success" id="btnSerahkan">
+        <i class="fas fa-check mr-1"></i> Serahkan
+    </button>
+    <!-- Close Modal Button -->
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+</div>
+
+        </div>
+    </div>
+</div>
+
 
         </div>
 
     </div>
 
+    <!-- Bootstrap & jQuery Scripts -->
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- DataTables -->
     <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
@@ -245,144 +257,103 @@
                 "pageLength": 10,
                 "language": {
                     "search": "Cari:",
-                    "lengthMenu": "Tampilkan _MENU_ data per halaman",
+                    "lengthMenu": "",
                     "zeroRecords": "Data tidak ditemukan",
-                    "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
+                    "info": "Menampilkan halaman PAGE dari PAGES",
                     "infoEmpty": "Tidak ada data tersedia",
-                    "infoFiltered": "(disaring dari _MAX_ total data)"
+                    "infoFiltered": "(disaring dari MAX total data)"
                 }
             });
 
-            $('.btnResep').on('click', function() {
-                const namaPasien = $(this).data('nama');
-                const tanggalResep = $(this).data('tanggal');
-                const obats = $(this).data('obat').split(',');
-                const jumlah = $(this).data('jumlah').split(',');
-                const aturanPakai = $(this).data('aturan').split(',');
-                const dosis = $(this).data('dosis').split(',');
+          $('.btnResep').on('click', function() {
+    // Get data for the modal
+        const resepId = $(this).data('pasien-id'); // Atau ganti sesuai kebutuhan, misalnya resep_id
+    resepIdTerpilih = resepId;
+    const namaPasien = $(this).data('nama');
+    const tanggalResep = $(this).data('tanggal');
+    const obats = $(this).data('obat').split(','); // Assuming multiple medications are separated by commas
 
-                $('#namaPasien').text(namaPasien);
-                $('#tanggalResep').text(tanggalResep);
+    const jumlah = $(this).data('jumlah').split(',');
+    const aturanPakai = $(this).data('aturan').split(',');
+    const dosis = $(this).data('dosis').split(',');
 
-                // Clear previous data
-                $('#medicationDetails').empty();
+    // Set patient info
+    $('#namaPasien').text(namaPasien);
+    $('#tanggalResep').text(tanggalResep);
 
-                // Insert medication data into the table
-                for (let i = 0; i < obats.length; i++) {
-                    $('#medicationDetails').append(`
-                        <tr>
-                            <td>${obats[i]}</td>
-                            <td>${jumlah[i]}</td>
-                            <td>${aturanPakai[i]}</td>
-                            <td>${dosis[i]}</td>
-                        </tr>
-                    `);
-                }
+    // Clear previous data
+    $('#medicationDetails').empty();
 
-                $('#resepModal').modal('show');
-            });
+    // Insert medication data into the table
+    for (let i = 0; i < obats.length; i++) {
+        $('#medicationDetails').append(`
+            <tr>
+                <td>${obats[i]}</td>
+                <td>${jumlah[i]}</td>
+                <td>${aturanPakai[i]}</td>
+                <td>${dosis[i]}</td>
+            </tr>
+        `);
+    }
 
-            $('#btnCetak').on('click', function() {
-                var resepId = $('#pasienID').text();
-                var namaPasien = $('#namaPasien').text();
-                var tanggalResep = $('#tanggalResep').text();
-                var medicationDetails = $('#medicationDetails').html();
+    // Show the modal
+    $('#resepModal').modal('show');
+});
 
-                $.ajax({
-                    url: '{{ route("updateStatus", ["id" => "__id__", "status" => "sudah diberikan"]) }}'.replace("__id__", resepId),
-                    type: 'GET',
-                    success: function(response) {
-                        var printWindow = window.open('', '', 'height=600,width=700');
-                        printWindow.document.write(`
-                            <html>
-                            <head>
-                                <title>Cetak Resep</title>
-                                <style>
-                                    body {
-                                        font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                                        padding: 30px;
-                                        color: #333;
-                                    }
-                                    h2 {
-                                        color: #4e73df;
-                                        border-bottom: 3px solid #4e73df;
-                                        padding-bottom: 10px;
-                                        margin-bottom: 25px;
-                                        font-weight: 700;
-                                    }
-                                    table {
-                                        width: 100%;
-                                        border-collapse: collapse;
-                                        margin-top: 20px;
-                                    }
-                                    table, th, td {
-                                        border: 1px solid #ddd;
-                                        padding: 8px;
-                                        text-align: left;
-                                    }
-                                    th {
-                                        background-color: #f8f9fc;
-                                        color: #4e73df;
-                                        font-weight: bold;
-                                    }
-                                    td {
-                                        font-size: 1rem;
-                                    }
-                                    strong {
-                                        color: #2e59d9;
-                                    }
-                                </style>
-                            </head>
-                            <body>
-                                <h2>Detail Resep Obat</h2>
-                                <table>
-                                    <tr>
-                                        <th>Nama Pasien</th>
-                                        <td>${namaPasien}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Tanggal Resep</th>
-                                        <td>${tanggalResep}</td>
-                                    </tr>
-                                </table>
 
-                                <h3>Detail Obat</h3>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Nama Obat</th>
-                                            <th>Jumlah</th>
-                                            <th>Aturan Pakai</th>
-                                            <th>Dosis</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${medicationDetails}
-                                    </tbody>
-                                </table>
-                            </body>
-                            </html>
-                        `);
-                        printWindow.document.close();
-                        printWindow.focus();
-                        printWindow.print();
-                        printWindow.close();
-                    }
-                });
-            });
 
-            $('#btnSerahkan').on('click', function() {
-                var resepId = $('#pasienID').text();
+$('#btnSerahkan').on('click', function () {
+    $.ajax({
+        url: '/UbahStatusResep',
+        type: 'GET',
+        success: function (res) {
+            alert(res.message);
+            location.reload();
+        },
+        error: function (xhr) {
+            alert('Error: ' + (xhr.responseJSON?.message || 'Gagal mengubah status'));
+        }
+    });
+});
 
-                $.ajax({
-                    url: '{{ route("updateStatus", ["id" => "__id__", "status" => "sudah diberikan"]) }}'.replace("__id__", resepId),
-                    type: 'GET',
-                    success: function(response) {
-                        alert('Resep sudah diserahkan!');
-                        $('#resepModal').modal('hide');
-                    }
-                });
-            });
+// Function to print the modal content
+document.getElementById('btnCetak').addEventListener('click', function () {
+    var namaPasien = document.getElementById('namaPasien').innerText;
+    var tanggalResep = document.getElementById('tanggalResep').innerText;
+    var medicationDetails = document.getElementById('medicationDetails').innerHTML;
+
+    // Creating a new window for printing
+    var printWindow = window.open('', '', 'height=600,width=700');
+    printWindow.document.write('<html><head><title>Detail Resep Obat</title>');
+    printWindow.document.write('<style>');
+    printWindow.document.write('body { font-family: Arial, sans-serif; padding: 20px; }');
+    printWindow.document.write('table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }');
+    printWindow.document.write('th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }');
+    printWindow.document.write('th { background-color: #f4f4f4; }');
+    printWindow.document.write('</style>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<h2>Detail Resep Obat</h2>');
+    printWindow.document.write('<table>');
+    printWindow.document.write('<tr><th style="width: 25%;">Detail</th><th>Data</th></tr>');
+    printWindow.document.write('<tr><td><strong>Nama Pasien:</strong></td><td>' + namaPasien + '</td></tr>');
+    printWindow.document.write('<tr><td><strong>Tanggal Resep:</strong></td><td>' + tanggalResep + '</td></tr>');
+    printWindow.document.write('</table>');
+
+    // Medication details table
+    printWindow.document.write('<table>');
+    printWindow.document.write('<thead><tr><th style="width: 25%;">Nama Obat</th><th style="width: 25%;">Jumlah</th><th style="width: 25%;">Aturan Pakai</th><th style="width: 25%;">Dosis</th></tr></thead>');
+    printWindow.document.write('<tbody>' + medicationDetails + '</tbody>');
+    printWindow.document.write('</table>');
+
+    printWindow.document.write('</body></html>');
+
+    // Wait until the document is fully loaded, then print
+    printWindow.document.close();
+    printWindow.print();
+});
+
+
+
         });
     </script>
 

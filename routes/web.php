@@ -131,7 +131,7 @@ Route::put('/lokasiobat/{id}', [LokasiController::class, 'update'])->name('lokas
 Route::get('/resepobat', [ResepController::class, 'index'])->name('resep.index');
 Route::get('/resep/update-status/{id}/{status}', [ResepController::class, 'updateStatus'])->name('updateStatus');
 Route::get('/resep/serahkan/{id}', [ResepController::class, 'serahkan'])->name('serahkan');
-
+Route::get('/UbahStatusResep', [ResepController::class, 'ngubahStatus']);
 
 
 // ====== Routes untuk Dokter ======

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Resep;
+use App\Models\ResepObat;
 use Illuminate\Http\Request;
 
 class ResepController extends Controller
@@ -74,6 +75,34 @@ class ResepController extends Controller
         return back()->with('error', 'Resep tidak ditemukan.');
     }
 
+
+public function ngubahStatus()
+{
+    // Ambil 2 data pertama yang belum diberikan
+    $reseps = ResepObat::where('status', 'belum diberikan')
+                ->orderBy('created_at', 'desc')
+                ->take(2)
+                ->get();
+
+    // Jika tidak ada data yang ditemukan
+    if ($reseps->isEmpty()) {
+        return response()->json(['message' => 'Tidak ada resep yang bisa diubah'], 404);
+    }
+
+    // Ubah status masing-masing menjadi "sudah diberikan"
+    foreach ($reseps as $resep) {
+        $resep->status = 'sudah diberikan';
+        $resep->save();
+    }
+
+    return response()->json([
+        'message' => 'Status 2 resep berhasil diubah',
+        'jumlah_diubah' => $reseps->count()
+    ]);
+}
+
+
+
     /**
      * Update the status of the prescription.
      *
@@ -81,22 +110,27 @@ class ResepController extends Controller
      * @param  string  $status
      * @return \Illuminate\Http\Response
      */
-    public function updateStatus($id, $status)
-    {
-        // Validate status
+   public function updateStatus(Request $request, $id)
+{
+    $resep = Resep::find($id);
+
+    if ($resep) {
+        $status = $request->input('status');  // Ambil status dari request
+
+        // Validasi status yang boleh diinput
         if (!in_array($status, ['belum diberikan', 'sudah diberikan'])) {
-            return back()->with('error', 'Status tidak valid.');
+            return response()->json(['error' => 'Status tidak valid.'], 400);
         }
 
-        // Find the prescription
-        $resep = Resep::find($id);
+        $resep->status = $status;
+        $resep->save();
 
-        if ($resep) {
-            $resep->status = $status;
-            $resep->save();
-            return back()->with('success', 'Status resep berhasil diperbarui.');
-        }
-
-        return back()->with('error', 'Resep tidak ditemukan.');
+        return response()->json(['success' => 'Status resep berhasil diperbarui.']);
     }
+
+    // Return jika resep tidak ditemukan
+    return response()->json(['error' => 'Resep tidak ditemukan.'], 404);
+}
+
+
 }
