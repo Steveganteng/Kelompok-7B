@@ -8,139 +8,130 @@ use App\Models\Pasien;
 use App\Models\Pemeriksaan;
 use App\Models\Resep;
 use App\Models\Obat;
+use App\Models\ResepObat;
 use App\Models\AlatKesehatan;
 
 class pemeriksaankesehatanController extends Controller
 {
     /**
-     * Tampilkan daftar pemeriksaan kesehatan
+     * Display a list of pemeriksaan kesehatan (patients and their prescriptions, etc. - can be customized)
      */
-    public function index()
-    {
-        $pemeriksaankesehatan = Pasien::with('pemeriksaan')->get();
-        return view('dokter.pemeriksaankesehatan', compact('pemeriksaankesehatan'));
-    }
+   public function index()
+{
+    // Fetch only patients with 'pemeriksaan kesehatan' pemeriksaan, and their associated reseps
+    $pemeriksaankesehatan = Pasien::whereHas('pemeriksaan', function ($query) {
+        $query->where('jenis_pemeriksaan', 'pemeriksaan kesehatan');
+    })
+    ->with('reseps')  // Eager load the reseps relation
+    ->get();
+
+    // Pass the filtered data to the view
+    return view('dokter.pemeriksaankesehatan', compact('pemeriksaankesehatan'));
+}
+
 
     /**
-     * Tampilkan form tambah pemeriksaan kesehatan
+     * Show the form for creating a new pemeriksaan kesehatan
      */
     public function create()
     {
+        // Fetch all medicines and medical instruments for the form
         $obats = Obat::all();
         $alatKesehatan = AlatKesehatan::all();
-
         return view('dokter.tambah_pemeriksaankesehatan', compact('obats', 'alatKesehatan'));
     }
 
     /**
-     * Proses penyimpanan data pemeriksaan kesehatan
+     * Store a newly created pemeriksaan kesehatan in the database
      */
-    public function store(Request $request)
-    {
-        $v = $request->validate([
-            // Data pasien
-            'nama_pasien'       => 'required|string',
-            'jenis_kelamin'     => 'required|string|in:Laki-laki,Perempuan',
-            'tempat_lahir'      => 'required|string',
-            'tanggal_lahir'     => 'required|date',
-            'alamat'            => 'required|string',
-            'telepon'           => 'required|string',
+  public function store(Request $request)
+{
+    // Validate incoming data
+    $validatedData = $request->validate([
+        'nama_pasien' => 'required|string',
+        'jenis_kelamin' => 'required|string|in:Laki-laki,Perempuan',
+        'tempat_lahir' => 'required|string',
+        'tanggal_lahir' => 'required|date',
+        'alamat' => 'required|string',
+        'telepon' => 'required|string',
+        'mulai_diwawati' => 'required|date_format:Y-m-d\TH:i',
+        'anamnesis' => 'nullable|string',
+        'tinggi_badan' => 'required|integer',
+        'berat_badan' => 'required|integer',
+        'suhu_tubuh' => 'required|numeric',
+        'saturasi_oksigen' => 'required|integer',
+        'tekanan_darah_sistolik' => 'required|integer',
+        'tekanan_darah_diastolik' => 'required|integer',
+        'nadi' => 'required|integer',
+        'laju_pernapasan' => 'required|integer',
+        'pemeriksaan_penunjang' => 'nullable|string',
+        'obat_dikonsumsi_sebelumnya' => 'nullable|string',
+        'diagnosa' => 'required|string',
+        'resep_data' => 'nullable|string',  // JSON data for prescriptions
+    ]);
 
-            // Pemeriksaan
-            'mulai_diwawati'    => 'required|date_format:Y-m-d\TH:i',
-            'anamnesis'         => 'nullable|string',
-            'tinggi_badan'      => 'required|integer',
-            'berat_badan'       => 'required|integer',
-            'suhu_tubuh'        => 'required|numeric',
-            'saturasi_oksigen'  => 'required|integer',
-            'tekanan_darah_sistolik'    => 'required|integer',
-            'tekanan_darah_diastolik'   => 'required|integer',
-            'nadi'              => 'required|integer',
-            'laju_pernapasan'   => 'required|integer',
-            'pemeriksaan_penunjang' => 'nullable|string',
-            'obat_dikonsumsi_sebelumnya' => 'nullable|string',
-            'diagnosa'          => 'required|string',
+    // Start a transaction to ensure data consistency
+    DB::transaction(function () use ($validatedData) {
+        // Tentukan jenis pemeriksaan dengan nilai default 'pemeriksaan kesehatan'
+        $jenisPemeriksaan = 'pemeriksaan kesehatan';  // Set default to 'pemeriksaan kesehatan'
 
-            // Data tindakan & resep JSON (string)
-            'tindakan_data'     => 'nullable|string',
-            'resep_data'        => 'nullable|string',
+        // Store the patient (pasien) data with jenis_pemeriksaan
+        $pasien = Pasien::create([
+            'nama_pasien' => $validatedData['nama_pasien'],
+            'tanggal_lahir' => $validatedData['tanggal_lahir'],
+            'jenis_kelamin' => $validatedData['jenis_kelamin'],
+            'alamat' => $validatedData['alamat'],
+            'telepon' => $validatedData['telepon'],
+            'jenis_pemeriksaan' => $jenisPemeriksaan,  // Set jenis_pemeriksaan to 'pemeriksaan kesehatan' by default
         ]);
 
-        DB::transaction(function () use ($v) {
-            // Simpan pasien
-            $pasien = Pasien::create([
-                'nama_pasien'   => $v['nama_pasien'],
-                'tanggal_lahir' => $v['tanggal_lahir'],
-                'jenis_kelamin' => $v['jenis_kelamin'],
-                'alamat'        => $v['alamat'],
-                'telepon'       => $v['telepon'],
+        // Store the pemeriksaan (examination) data
+        Pemeriksaan::create([
+            'pasien_id' => $pasien->id_pasien,
+            'mulai_diwawati' => $validatedData['mulai_diwawati'],
+            'anamnesis' => $validatedData['anamnesis'],
+            'tinggi_badan' => $validatedData['tinggi_badan'],
+            'berat_badan' => $validatedData['berat_badan'],
+            'suhu_tubuh' => $validatedData['suhu_tubuh'],
+            'saturasi_oksigen' => $validatedData['saturasi_oksigen'],
+            'tekanan_darah_sistolik' => $validatedData['tekanan_darah_sistolik'],
+            'tekanan_darah_diastolik' => $validatedData['tekanan_darah_diastolik'],
+            'nadi' => $validatedData['nadi'],
+            'laju_pernapasan' => $validatedData['laju_pernapasan'],
+            'pemeriksaan_penunjang' => $validatedData['pemeriksaan_penunjang'],
+            'obat_dikonsumsi_sebelumnya' => $validatedData['obat_dikonsumsi_sebelumnya'],
+            'diagnosa' => $validatedData['diagnosa'],
+        ]);
+
+        // Handle prescriptions data
+        $resepList = json_decode($validatedData['resep_data'] ?? '[]', true);
+        if (!empty($resepList)) {
+            $resep = Resep::create([
+                'tanggal' => now(),
+                'deskripsi' => 'Resep obat untuk pasien',
+                'jenis_rawat' => $jenisPemeriksaan,  // Sesuaikan jenis rawat untuk resep
+                'user_id' => auth()->check() ? auth()->user()->id_user : null,
+                'pasien_id' => $pasien->id_pasien,
             ]);
 
-            // Simpan pemeriksaan
-            Pemeriksaan::create([
-                'pasien_id'                 => $pasien->id_pasien,
-                'mulai_diwawati'            => $v['mulai_diwawati'],
-                'anamnesis'                 => $v['anamnesis'] ?? null,
-                'tinggi_badan'              => $v['tinggi_badan'],
-                'berat_badan'               => $v['berat_badan'],
-                'suhu_tubuh'                => $v['suhu_tubuh'],
-                'saturasi_oksigen'          => $v['saturasi_oksigen'],
-                'tekanan_darah_sistolik'    => $v['tekanan_darah_sistolik'],
-                'tekanan_darah_diastolik'   => $v['tekanan_darah_diastolik'],
-                'nadi'                      => $v['nadi'],
-                'laju_pernapasan'           => $v['laju_pernapasan'],
-                'pemeriksaan_penunjang'     => $v['pemeriksaan_penunjang'] ?? null,
-                'obat_dikonsumsi_sebelumnya'=> $v['obat_dikonsumsi_sebelumnya'] ?? null,
-                'diagnosa'                  => $v['diagnosa'],
-            ]);
-
-            $userId = auth()->check() ? auth()->user()->id_user : null;
-
-            // Simpan data tindakan
-            $tindakanList = json_decode($v['tindakan_data'] ?? '[]', true);
-            if (!empty($tindakanList)) {
-                foreach ($tindakanList as $t) {
-                    if (!empty($t['nama_tindakan']) && !empty($t['alat_id']) && !empty($t['jumlah'])) {
-                        $alat = AlatKesehatan::find($t['alat_id']);
-                        $namaAlat = $alat ? $alat->nama : 'Alat tidak ditemukan';
-
-                        Resep::create([
-                            'tanggal' => now(),
-                            'deskripsi' => "{$t['nama_tindakan']} ({$namaAlat})",
-                            'jenis_rawat' => 'pemeriksaan kesehatan',
-                            'user_id' => $userId,
-                            'pasien_id' => $pasien->id_pasien,
-                            'obat_id' => null,
-                            'jumlah' => $t['jumlah'],
-                            'aturan_pakai' => null,
-                            'dosis' => null,
-                        ]);
-                    }
+            // Attach each prescription (medication) to the resep (prescription)
+            foreach ($resepList as $r) {
+                if (!empty($r['obat_id']) && !empty($r['jumlah']) && !empty($r['aturan_pakai']) && !empty($r['dosis'])) {
+                    $obat = Obat::find($r['obat_id']);
+                    ResepObat::create([ // Save each medication into the pivot table
+                        'resep_id' => $resep->id_resep,
+                        'obat_id' => $obat->id_obat,
+                        'jumlah' => $r['jumlah'],
+                        'aturan_pakai' => $r['aturan_pakai'],
+                        'dosis' => $r['dosis'],
+                        'status' => 'belum diberikan'  // Set the default status for each obat
+                    ]);
                 }
             }
+        }
+    });
 
-            // Simpan data resep obat
-            $resepList = json_decode($v['resep_data'] ?? '[]', true);
-            if (!empty($resepList)) {
-                foreach ($resepList as $r) {
-                    if (!empty($r['obat_id']) && !empty($r['jumlah']) && !empty($r['aturan_pakai']) && !empty($r['dosis'])) {
-                        $obat = Obat::find($r['obat_id']);
-                        Resep::create([
-                            'tanggal' => now(),
-                            'deskripsi' => $obat ? $obat->nama_dagang_obat : 'Obat tidak ditemukan',
-                            'jenis_rawat' => 'pemeriksaan kesehatan',
-                            'user_id' => $userId,
-                            'pasien_id' => $pasien->id_pasien,
-                            'obat_id' => $r['obat_id'],
-                            'jumlah' => $r['jumlah'],
-                            'aturan_pakai' => $r['aturan_pakai'],
-                            'dosis' => $r['dosis'],
-                        ]);
-                    }
-                }
-            }
-        });
+    return redirect()->route('pemeriksaankesehatan.index')->with('success', 'pemeriksaan kesehatan berhasil disimpan.');
+}
 
-        return redirect()->route('pemeriksaankesehatan.index')->with('success', 'pemeriksaan kesehatan berhasil disimpan.');
-    }
 }

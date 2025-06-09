@@ -8,156 +8,28 @@
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet" />
     <style>
-        /* General Stepper Layout */
-        .stepper {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
         .step {
-            width: 25%;
+            width: 100px;
             text-align: center;
-            font-size: 0.875rem;
         }
 
-        .step .icon {
-            display: inline-block;
-            background-color: #ccc;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            line-height: 35px;
-            color: white;
-            margin-bottom: 8px;
-        }
-
-        .step.active .icon {
-            background-color: #4e73df;
-        }
-
-        .step.completed .icon {
-            background-color: #28a745;
+        .icon {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .line {
             height: 2px;
             background: #ccc;
             flex-grow: 1;
-            margin: 0 5px;
-            align-self: center;
+            margin: 0 8px;
         }
 
-        .progress-bar {
-            height: 4px;
-            background-color: #4e73df;
-            transition: width 0.3s ease;
-        }
-
-        .step h5 {
-            font-size: 0.875rem;
-            margin-top: 5px;
-        }
-
-        .form-step {
-            display: none;
-        }
-
-        .form-step.active {
-            display: block;
-        }
-
-        .btn-primary {
-            background-color: #4e73df;
-            border-color: #4e73df;
-            font-size: 0.875rem;
-            padding: 0.4rem 0.75rem;
-        }
-
-        /* Form Input Sizes */
-        .form-control {
-            font-size: 0.875rem;
-            padding: 0.5rem 0.75rem;
-            height: auto;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        /* Table styles */
-        table {
-            width: 100%;
-            table-layout: fixed;
-            font-size: 0.875rem;
-        }
-
-        th, td {
-            text-align: center;
-            padding: 0.5rem;
-        }
-
-        th {
-            background-color: #f8f9fc;
-        }
-
-        /* Adjust spacing for smaller screen sizes */
-        @media (max-width: 768px) {
-            .stepper {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .step {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            .line {
-                width: 100%;
-                margin-top: 10px;
-            }
-
-            .form-control {
-                font-size: 0.875rem;
-                padding: 0.5rem;
-            }
-
-            table {
-                font-size: 0.75rem;
-            }
-
-            .btn-primary {
-                font-size: 0.875rem;
-                padding: 0.4rem 0.75rem;
-            }
-        }
-
-        /* Button styles for action buttons */
-        .btn {
-            font-size: 0.875rem;
-            padding: 0.5rem 1rem;
-        }
-
-        .btn-secondary {
-            font-size: 0.875rem;
-            padding: 0.5rem 1rem;
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-
-        .btn-success {
-            font-size: 0.875rem;
-            padding: 0.5rem 1rem;
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .btn-danger {
-            font-size: 0.875rem;
-            padding: 0.5rem 1rem;
-            background-color: #dc3545;
-            border-color: #dc3545;
+        .step .icon.bg-primary {
+            background-color: #4e73df !important;
         }
     </style>
 </head>
@@ -168,166 +40,138 @@
 
         <div class="container-fluid mt-4">
             <h1 class="h3 mb-4 text-gray-800">Input Pemeriksaan Pasien</h1>
-
             <div class="card shadow p-4">
                 <form id="keteranganberobat-form" action="{{ route('keteranganberobat.store') }}" method="POST">
                     @csrf
 
                     <!-- Stepper Navigation -->
-                    <div class="stepper">
-                        <div class="step active" id="step1-nav">
-                            <div class="icon">
-                                <i class="fas fa-user"></i>
+                    <div class="d-flex text-center mb-4">
+                        @foreach([1=>'user',2=>'notes-medical',3=>'heartbeat',4=>'pills'] as $i=>$icon)
+                            <div class="step" id="step{{ $i }}-nav">
+                                <div class="icon bg-secondary text-white rounded-circle mb-2">
+                                    <i class="fas fa-{{ $icon }}"></i>
+                                </div>
+                                <small>
+                                    @switch($i)
+                                        @case(1) Data Pasien @break
+                                        @case(2) Pemeriksaan @break
+                                        @case(3) Tindakan @break
+                                        @case(4) Resep Obat @break
+                                    @endswitch
+                                </small>
                             </div>
-                            <h5>Data Pasien</h5>
+                            @if($i < 4)
+                                <div class="line"></div>
+                            @endif
+                        @endforeach
+                    </div>
+
+                    {{-- STEP 1: Data Pasien --}}
+                    <div id="step1">
+                        <div class="form-group">
+                            <label>Nama Pasien</label>
+                            <input name="nama_pasien" type="text" class="form-control" required />
                         </div>
-                        <div class="line"></div>
-                        <div class="step" id="step2-nav">
-                            <div class="icon">
-                                <i class="fas fa-notes-medical"></i>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Jenis Kelamin</label>
+                                <select name="jenis_kelamin" class="form-control" required>
+                                    <option value="">Pilih</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
                             </div>
-                            <h5>Pemeriksaan</h5>
+                            <div class="form-group col-md-6">
+                                <label>Tempat Lahir</label>
+                                <input name="tempat_lahir" type="text" class="form-control" required />
+                            </div>
                         </div>
-                        <div class="line"></div>
-                        <div class="step" id="step3-nav">
-                            <div class="icon">
-                                <i class="fas fa-heartbeat"></i>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Tanggal Lahir</label>
+                                <input name="tanggal_lahir" type="date" class="form-control" required />
                             </div>
-                            <h5>Tindakan</h5>
+                            <div class="form-group col-md-6">
+                                <label>No. Telepon</label>
+                                <input name="telepon" type="text" class="form-control" required />
+                            </div>
                         </div>
-                        <div class="line"></div>
-                        <div class="step" id="step4-nav">
-                            <div class="icon">
-                                <i class="fas fa-pills"></i>
-                            </div>
-                            <h5>Resep Obat</h5>
+                        <div class="form-group">
+                            <label>Alamat</label>
+                            <textarea name="alamat" rows="2" class="form-control" required></textarea>
+                        </div>
+                        <div class="text-right">
+                            <button type="button" class="btn btn-primary" onclick="goToStep(2)">Selanjutnya &rarr;</button>
                         </div>
                     </div>
 
-                    <!-- Progress Bar -->
-                    <div class="progress mb-4">
-                        <div class="progress-bar" id="progress-bar" style="width: 25%;"></div>
+                    {{-- STEP 2: Pemeriksaan --}}
+                    <div id="step2" style="display:none">
+                        <div class="form-group">
+                            <label>Mulai Dirawat</label>
+                            <input name="mulai_diwawati" type="datetime-local" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Anamnesis</label>
+                            <textarea name="anamnesis" rows="2" class="form-control"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label>Tinggi (cm)</label>
+                                <input name="tinggi_badan" type="number" class="form-control" required />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Berat (kg)</label>
+                                <input name="berat_badan" type="number" class="form-control" required />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Suhu (°C)</label>
+                                <input name="suhu_tubuh" type="number" step="0.1" class="form-control" required />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label>Saturasi (%)</label>
+                                <input name="saturasi_oksigen" type="number" class="form-control" required />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Sistolik (mmHg)</label>
+                                <input name="tekanan_darah_sistolik" type="number" class="form-control" required />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Diastolik (mmHg)</label>
+                                <input name="tekanan_darah_diastolik" type="number" class="form-control" required />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Denyut Nadi</label>
+                                <input name="nadi" type="number" class="form-control" required />
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Laju Pernapasan</label>
+                                <input name="laju_pernapasan" type="number" class="form-control" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Pemeriksaan Penunjang</label>
+                            <textarea name="pemeriksaan_penunjang" rows="2" class="form-control"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Obat Sebelumnya</label>
+                            <textarea name="obat_dikonsumsi_sebelumnya" rows="2" class="form-control"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Diagnosa</label>
+                            <textarea name="diagnosa" rows="2" class="form-control" required></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="goToStep(1)">&larr; Sebelumnya</button>
+                            <button type="button" class="btn btn-primary" onclick="goToStep(3)">Selanjutnya &rarr;</button>
+                        </div>
                     </div>
 
-{{-- STEP 1: Data Pasien --}}
-<div class="form-step active" id="step1">
-    <div class="form-group">
-        <label>Nama Pasien</label>
-        <input name="nama_pasien" type="text" class="form-control" required />
-    </div>
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label>Jenis Kelamin</label>
-            <select name="jenis_kelamin" class="form-control" required>
-                <option value="">Pilih</option>
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
-            </select>
-        </div>
-        <div class="form-group col-md-6">
-            <label>Tempat Lahir</label>
-            <input name="tempat_lahir" type="text" class="form-control" required />
-        </div>
-    </div>
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label>Tanggal Lahir</label>
-            <input name="tanggal_lahir" type="date" class="form-control" id="tanggal-lahir" required />
-        </div>
-        <div class="form-group col-md-6">
-            <label>No. Telepon</label>
-            <input name="telepon" type="text" class="form-control" id="telepon" required />
-        </div>
-    </div>
-    <div class="form-group">
-        <label>Alamat</label>
-        <textarea name="alamat" rows="2" class="form-control" required></textarea>
-    </div>
-    <div class="d-flex justify-content-end">
-        <button type="button" class="btn btn-primary" onclick="goToStep(2)">Selanjutnya &rarr;</button>
-    </div>
-</div>
-
-{{-- STEP 2: Pemeriksaan --}}
-<div class="form-step" id="step2">
-    <h4 class="mb-4 text-primary">Pemeriksaan Pasien</h4>
-
-    <!-- Grouped Fields for Date, Anamnesis, and Start of Treatment -->
-    <div class="form-row mb-3">
-        <div class="form-group col-md-6">
-            <label>Mulai Dirawat</label>
-            <input name="mulai_diwawati" type="datetime-local" class="form-control" required />
-        </div>
-        <div class="form-group col-md-6">
-            <label>Anamnesis</label>
-            <textarea name="anamnesis" rows="2" class="form-control"></textarea>
-        </div>
-    </div>
-
-    <!-- Grouped Fields for Vital Signs (Tinggi, Berat, Suhu, Saturasi) -->
-    <div class="form-row mb-3">
-        <div class="form-group col-md-3">
-            <label>Tinggi (cm)</label>
-            <input name="tinggi_badan" type="number" class="form-control" min="0" required />
-        </div>
-        <div class="form-group col-md-3">
-            <label>Berat (kg)</label>
-            <input name="berat_badan" type="number" class="form-control" min="0" required />
-        </div>
-        <div class="form-group col-md-3">
-            <label>Suhu (°C)</label>
-            <input name="suhu_tubuh" type="number" step="0.1" class="form-control" min="0" required />
-        </div>
-        <div class="form-group col-md-3">
-            <label>Saturasi (%)</label>
-            <input name="saturasi_oksigen" type="number" class="form-control" min="0" required />
-        </div>
-    </div>
-
-    <!-- Grouped Fields for Blood Pressure (Sistolik, Diastolik) and Pulse -->
-    <div class="form-row mb-3">
-        <div class="form-group col-md-3">
-            <label>Sistolik (mmHg)</label>
-            <input name="tekanan_darah_sistolik" type="number" class="form-control" min="0" required />
-        </div>
-        <div class="form-group col-md-3">
-            <label>Diastolik (mmHg)</label>
-            <input name="tekanan_darah_diastolik" type="number" class="form-control" min="0" required />
-        </div>
-        <div class="form-group col-md-3">
-            <label>Denyut Nadi</label>
-            <input name="nadi" type="number" class="form-control" min="0" required />
-        </div>
-        <div class="form-group col-md-3">
-            <label>Laju Pernapasan</label>
-            <input name="laju_pernapasan" type="number" class="form-control" min="0" required />
-        </div>
-    </div>
-
-    <!-- Additional Fields for Examination & Diagnosis -->
-    <div class="form-group mb-3">
-        <label>Pemeriksaan Penunjang</label>
-        <textarea name="pemeriksaan_penunjang" rows="2" class="form-control"></textarea>
-    </div>
-
-    <div class="form-group mb-3">
-        <label>Obat yang Sudah Dikonsumsi</label>
-        <textarea name="obat_dikonsumsi_sebelumnya" rows="2" class="form-control"></textarea>
-    </div>
-
-    <div class="form-group mb-3">
-        <label>Diagnosa</label>
-        <textarea name="diagnosa" rows="2" class="form-control" required></textarea>
-    </div>
-
-    <!-- Navigation Buttons with Equal Space Distribution -->
-    <div class="d-flex justify-content-between mt-4">
-        <button type="button" class="btn btn-secondary" onclick="goToStep(1)">&larr; Sebelumnya</button>
-        <button type="button" class="btn btn-primary" onclick="goToStep(3)">Selanjutnya &rarr;</button>
-    </div>
-</div>
-
-                    {{-- STEP 3: Tindakan Kesehatan --}}
+       {{-- STEP 3: Tindakan Kesehatan --}}
 <div class="form-step" id="step3">
     <h4 class="mb-3">Tindakan Kesehatan</h4>
     <div class="d-flex justify-content-between">
@@ -447,7 +291,6 @@
         <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Simpan Data</button>
     </div>
 </div>
-
                 </form>
             </div>
         </div>
@@ -460,19 +303,16 @@
         let alatKesehatan = [];
         let resepList = [];
 
-        // Step Navigation Logic
+        // Navigasi step
         function goToStep(step) {
             [1, 2, 3, 4].forEach(i => {
                 document.getElementById('step' + i).style.display = (i === step ? 'block' : 'none');
                 document.querySelector(`#step${i}-nav .icon`)
                     .classList.toggle('bg-primary', i === step);
             });
-
-            // Update progress bar width
-            document.getElementById('progress-bar').style.width = (step * 25) + '%';
         }
 
-        // Add Tindakan
+        // Tambah Tindakan (step 3)
         function tambahTindakan() {
             const nama_tindakan = document.getElementById('nama_tindakan').value.trim();
             const alat_id = document.getElementById('nama_alat').value;
@@ -515,7 +355,6 @@
                 if (option) namaAlat = option.textContent;
 
                 tbody.insertAdjacentHTML('beforeend', `
-
                     <tr>
                         <td>${t.nama_tindakan}</td>
                         <td>${namaAlat}</td>
@@ -534,7 +373,7 @@
             renderTindakan();
         }
 
-        // Add Obat
+        // Tambah Obat (step 4)
         function tambahObat() {
             const obat_id = document.getElementById('nama_dagang_obat').value;
             const nama_dagang_obat = document.getElementById('nama_dagang_obat').selectedOptions[0]?.text || '';
@@ -594,21 +433,11 @@
             renderObat();
         }
 
-        // Prevent negative numbers in input fields
-        const inputs = document.querySelectorAll('input[type="number"]');
-        inputs.forEach(input => {
-            input.addEventListener('input', (e) => {
-                if (e.target.value < 0) e.target.value = 0;
-            });
+        // Sebelum submit, pastikan JSON tersimpan
+        document.getElementById('keteranganberobat-form').addEventListener('submit', () => {
+            document.getElementById('tindakan_data').value = JSON.stringify(alatKesehatan);
+            document.getElementById('resep_data').value = JSON.stringify(resepList);
         });
-
-        // Prevent non-numeric input
-        document.getElementById('telepon').addEventListener('input', function(e) {
-            this.value = this.value.replace(/\D/g, '');  // Allow only digits
-        });
-
-        // Disable future dates for the birthdate input
-        document.getElementById('tanggal-lahir').setAttribute('max', new Date().toISOString().split('T')[0]);
 
         // Inisialisasi ke step 1
         goToStep(1);
