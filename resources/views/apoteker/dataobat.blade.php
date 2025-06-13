@@ -99,7 +99,7 @@
                     'hijau','aman'              => 'penanda-hijau',
                     default                      => 'penanda-default',
                 };
-                $stokWarning       = $obat->stok <= 10;
+                $stokWarning       = $obat->stok <= 50;
                 $tglKadaluarsa     = $obat->tgl_kadaluarsa ? Carbon::parse($obat->tgl_kadaluarsa) : null;
                 $kadaluarsaWarning = $tglKadaluarsa
                                      && !$tglKadaluarsa->isPast()
